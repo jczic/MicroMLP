@@ -92,7 +92,7 @@ print(mlp.Predict([nnTrue , nnFalse])[0].AsBool)
 | - | - | - | - |
 | ![HC²](graphe_binary.png "Binary step") | `"Binary"` | MicroMLP.ACTFUNC_BINARY | Binary step |
 | ![HC²](graphe_sigmoid.png "Logistic (sigmoid or soft step)") | `"Sigmoid"` | MicroMLP.ACTFUNC_SIGMOID | Logistic (sigmoid or soft step) |
-| ![HC²](graphe_tanh.png "Hyperbolic tangent") | `"Tanh"` | MicroMLP.ACTFUNC_TANH | Hyperbolic tangent |
+| ![HC²](graphe_tanh.png "Hyperbolic tangent") | `"TanH"` | MicroMLP.ACTFUNC_TANH | Hyperbolic tangent |
 | ![HC²](graphe_relu.png "Rectified linear unit") | `"ReLU"` | MicroMLP.ACTFUNC_RELU | Rectified linear unit |
 | ![HC²](graphe_gaussian.png "Gaussian function") | `"Gaussian"` | MicroMLP.ACTFUNC_GAUSSIAN | Gaussian function |
 

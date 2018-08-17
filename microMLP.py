@@ -17,7 +17,7 @@ class MicroMLP :
 
     ACTFUNC_BINARY   = 'Binary'
     ACTFUNC_SIGMOID  = 'Sigmoid'
-    ACTFUNC_TANH     = 'Tanh'
+    ACTFUNC_TANH     = 'TanH'
     ACTFUNC_RELU     = 'ReLU'
     ACTFUNC_GAUSSIAN = 'Gaussian'
 
@@ -482,7 +482,7 @@ class MicroMLP :
         return 1.0 / ( 1.0 + exp(-x) )
 
     @staticmethod
-    def TanhActivation(sum, gain) :
+    def TanHActivation(sum, gain) :
         x    = sum * gain
         tanh = 2.0 / (1.0 + exp(-2.0 * x)) - 1.0
         return (tanh / 2.0) + 0.5
@@ -509,7 +509,7 @@ class MicroMLP :
         funcs = {
             MicroMLP.ACTFUNC_BINARY   : MicroMLP.BinaryActivation,
             MicroMLP.ACTFUNC_SIGMOID  : MicroMLP.SigmoidActivation,
-            MicroMLP.ACTFUNC_TANH     : MicroMLP.TanhActivation,
+            MicroMLP.ACTFUNC_TANH     : MicroMLP.TanHActivation,
             MicroMLP.ACTFUNC_RELU     : MicroMLP.ReLUActivation,
             MicroMLP.ACTFUNC_GAUSSIAN : MicroMLP.GaussianActivation
         }
