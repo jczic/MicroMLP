@@ -106,7 +106,7 @@ Use deep learning for :
 | Name | Function |
 | - | - |
 | Constructor | `outputLayer = MicroMLP.OutputLayer(parentMicroMLP, neuronsCount=0, activateFunctionName=None)` |
-| GetOutputVectorValues | `outputLayer.GetOutputVectorValues()` |
+| GetOutputVectorNNValues | `outputLayer.GetOutputVectorNNValues()` |
 | ComputeTargetLayerError | `outputLayer.ComputeTargetLayerError(targetVectorNNValues)` |
 
 ### Using *MicroMLP.Neuron* class :

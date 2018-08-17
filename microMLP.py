@@ -414,7 +414,7 @@ class MicroMLP :
 
         # -[ Public functions ]---------------------------------
 
-        def GetOutputVectorValues(self) :
+        def GetOutputVectorNNValues(self) :
             nnvalues = [ ]
             for n in self._neurons :
                 nnvalues.append(MicroMLP.NNValue.FromAnalogSignal(n.ComputedValue))
@@ -581,7 +581,7 @@ class MicroMLP :
 
     def Predict(self, inputVectorNNValues) :
         if self._simulate(inputVectorNNValues) :
-            return self.GetOutputLayer().GetOutputVectorValues()
+            return self.GetOutputLayer().GetOutputVectorNNValues()
         return None
 
     def SaveToFile(self, filename) :
