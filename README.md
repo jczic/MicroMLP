@@ -5,6 +5,61 @@
 Very easy to integrate and very light with one file only :
 - `"microMLP.py"`
 
+Use deep learning for :
+- Signal processing (speech processing, identification, filtering)
+- Image processing (compression, recognition, patterns)
+- Control (diagnosis, quality control, robotics)
+- Optimization (planning, traffic regulation, finance)
+- Simulation (black box simulation)
+- Classification (DNA analysis)
+- Approximation (unknown function, complex function)
+
+### Using *microMLP* static functions :
+
+| Name  | Function |
+| - | - |
+| Create | `mlp = MicroMLP.Create(neuronsByLayers, activateFunctionName, layersAutoConnectFunction=None)` |
+| LoadFromFile | `mlp = MicroMLP.LoadFromFile(filename)` |
+
+### Using *microMLP* main class :
+
+| Name  | Function |
+| - | - |
+| Constructor | `mlp = MicroMLP(activateFunctionName)` |
+| GetLayer | `mlp.GetLayer(layerIndex)` |
+| GetLayerIndex | `mlp.GetLayerIndex(layer)` |
+| RemoveLayer | `mlp.RemoveLayer(layer)` |
+| GetInputLayer | `mlp.GetInputLayer()` |
+| GetOutputLayer | `mlp.GetOutputLayer()` |
+| Learn | `mlp.Learn(inputVectorNNValues, targetVectorNNValues)` |
+| Test | `mlp.Test(inputVectorNNValues, targetVectorNNValues)` |
+| Predict | `mlp.GetLayer(inputVectorNNValues)` |
+| SaveToFile | `mlp.GetLayer(filename)` |
+| AddExample | `mlp.AddExample(inputVectorNNValues, targetVectorNNValues)` |
+| ClearExamples | `mlp.ClearExamples()` |
+| LearnExamples | `mlp.LearnExamples(timeInSec)` |
+
+| Name  | Property |
+| - | - |
+| Layers | `mlp.Layers` |
+| LayersCount | `mlp.LayersCount` |
+| ActivateFunctionName | `mlp.ActivateFunctionName` |
+| IsNetworkComplete | `mlp.IsNetworkComplete` |
+| MSE | `mlp.MSE` |
+| MAE | `mlp.MAE` |
+| MSEPercent | `mlp.MSEPercent` |
+| MAEPercent | `mlp.MAEPercent` |
+| ExamplesCount | `mlp.ExamplesCount` |
+
+| Activation function names |
+| 'Binary' |
+| 'Sigmoid' |
+| 'Tanh' |
+| 'ReLU' |
+| 'Gaussian' |
+
+| Layers auto-connect functions |
+| MicroMLP.LayersFullConnect |
 
 
 ### By JC`zic for [HC²](https://www.hc2.fr) ;')
