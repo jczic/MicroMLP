@@ -476,9 +476,7 @@ class MicroMLP :
     @staticmethod
     def BinaryActivation(sum, gain) :
         x = sum * gain
-        s = 1.0 if (x >= 0) else 0.0
-        print("x=%s, s=%s" % (x, s))
-        return s
+        return 1.0 if (x >= 0) else 0.0
 
     @staticmethod
     def SigmoidActivation(sum, gain) :
