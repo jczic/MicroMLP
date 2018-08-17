@@ -57,13 +57,13 @@ Use deep learning for :
 | `MicroMLP.Alpha` | 0.75 |
 | `MicroMLP.Gain` | 2.70 |
 
-| Activation function name | Const | Detail |
-| - | - | - |
-| `"Binary"` | MicroMLP.ACTFUNC_BINARY | Binary step |
-| `"Sigmoid"` | MicroMLP.ACTFUNC_SIGMOID | Logistic (sigmoid or soft step) |
-| `"Tanh"` | MicroMLP.ACTFUNC_TANH | Hyperbolic tangent |
-| `"ReLU"` | MicroMLP.ACTFUNC_RELU | Rectified linear unit |
-| `"Gaussian"` | MicroMLP.ACTFUNC_GAUSSIAN | Gaussian function |
+| Graphe | Activation function name | Const | Detail |
+| - | - | - | - |
+| ![HC²](graphe_binary.png "Binary step") | `"Binary"` | MicroMLP.ACTFUNC_BINARY | Binary step |
+| ![HC²](graphe_sigmoid.png "Logistic (sigmoid or soft step)") | `"Sigmoid"` | MicroMLP.ACTFUNC_SIGMOID | Logistic (sigmoid or soft step) |
+| ![HC²](graphe_tanh.png "Hyperbolic tangent") | `"Tanh"` | MicroMLP.ACTFUNC_TANH | Hyperbolic tangent |
+| ![HC²](graphe_relu.png "Rectified linear unit") | `"ReLU"` | MicroMLP.ACTFUNC_RELU | Rectified linear unit |
+| ![HC²](graphe_gaussian.png "Gaussian function") | `"Gaussian"` | MicroMLP.ACTFUNC_GAUSSIAN | Gaussian function |
 
 | Layers auto-connect function | Detail |
 | - | - |
