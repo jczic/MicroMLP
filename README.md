@@ -53,17 +53,17 @@ Use deep learning for :
 
 | Variable | Default |
 | - | - |
-| `'MicroMLP.Eta'` | 0.30 |
-| `'MicroMLP.Alpha'` | 0.75 |
-| `'MicroMLP.Gain'` | 2.70 |
+| `MicroMLP.Eta` | 0.30 |
+| `MicroMLP.Alpha` | 0.75 |
+| `MicroMLP.Gain` | 2.70 |
 
 | Activation function name | Const | Detail |
 | - | - | - |
-| `'Binary'` | MicroMLP.ACTFUNC_BINARY | Binary step |
-| `'Sigmoid'` | MicroMLP.ACTFUNC_SIGMOID | Logistic (sigmoid or soft step) |
-| `'Tanh'` | MicroMLP.ACTFUNC_TANH | Hyperbolic tangent |
-| `'ReLU'` | MicroMLP.ACTFUNC_RELU | Rectified linear unit |
-| `'Gaussian'` | MicroMLP.ACTFUNC_GAUSSIAN | Gaussian function |
+| `"Binary"` | MicroMLP.ACTFUNC_BINARY | Binary step |
+| `"Sigmoid"` | MicroMLP.ACTFUNC_SIGMOID | Logistic (sigmoid or soft step) |
+| `"Tanh"` | MicroMLP.ACTFUNC_TANH | Hyperbolic tangent |
+| `"ReLU"` | MicroMLP.ACTFUNC_RELU | Rectified linear unit |
+| `"Gaussian"` | MicroMLP.ACTFUNC_GAUSSIAN | Gaussian function |
 
 | Layers auto-connect function | Detail |
 | - | - |
