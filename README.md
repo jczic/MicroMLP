@@ -52,6 +52,7 @@ Use deep learning for :
 | ExamplesCount | `mlp.ExamplesCount` |
 
 | Activation function name | Name |
+| - | - |
 | 'Binary' | Binary step |
 | 'Sigmoid' | Logistic (sigmoid or soft step) |
 | 'Tanh' | Hyperbolic tangent |
@@ -59,6 +60,7 @@ Use deep learning for :
 | 'Gaussian' | Gaussian function |
 
 | Layers auto-connect function | Detail |
+| - | - |
 | MicroMLP.LayersFullConnect | Network fully connected |
 
 
