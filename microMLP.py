@@ -474,11 +474,11 @@ class MicroMLP :
     @staticmethod
     def BinaryActivation(sum, gain) :
         x = sum * gain
-        return 1.0 if (x >= 0.0) else 0.0
+        return 1.0 if (x >= 0) else 0.0
 
     @staticmethod
     def SigmoidActivation(sum, gain) :
-        x = sum
+        x = sum * gain
         return 1.0 / ( 1.0 + exp(-x) )
 
     @staticmethod
