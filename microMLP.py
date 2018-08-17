@@ -140,15 +140,15 @@ class MicroMLP :
             neuronDst.AddInputConnection(self)
             self._neuronSrc      = neuronSrc
             self._neuronDst      = neuronDst
-            self._weight         = weight if weight else MicroMLP.RandomFloat()
+            self._weight         = weight if weight else (MicroMLP.RandomFloat()-0.5)
             self._momentumWeight = 0.0
 
         # -[ Public functions ]---------------------------------
 
         def ComputeWeight(self, eta, alpha) :
-            self._weight         += ( eta   * self._neuronSrc.ComputedValue * self._neuronDst.ComputedError ) \
-                                  + ( alpha * self._momentumWeight )
-            self._momentumWeight  = ( eta   * self._neuronSrc.ComputedValue * self._neuronDst.ComputedError )
+            w = eta * self._neuronSrc.ComputedValue * self._neuronDst.ComputedError
+            self._weight         += w + (alpha * self._momentumWeight)
+            self._momentumWeight  = w
 
         def Remove(self) :
             if self._neuronSrc and self._neuronDst :
