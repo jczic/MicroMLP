@@ -22,7 +22,7 @@ class MicroMLP :
     ACTFUNC_GAUSSIAN = 'Gaussian'
 
     Eta              = 0.30
-    Alpha            = 0.75
+    Alpha            = 0.85
     Gain             = 2.70
 
     # -------------------------------------------------------------------------
@@ -474,11 +474,11 @@ class MicroMLP :
     @staticmethod
     def BinaryActivation(sum, gain) :
         x = sum * gain
-        return 1.0 if (x >= 0) else 0.0
+        return 1.0 if (x >= 0.0) else 0.0
 
     @staticmethod
     def SigmoidActivation(sum, gain) :
-        x = sum * gain
+        x = sum
         return 1.0 / ( 1.0 + exp(-x) )
 
     @staticmethod
@@ -678,13 +678,13 @@ class MicroMLP :
     @property
     def MSEPercent(self) :
         if self.IsNetworkComplete :
-            return self.GetOutputLayer().GetMeanSquareErrorAsPercent()
+            return round( self.GetOutputLayer().GetMeanSquareErrorAsPercent() * 100 ) / 100
         return 0.0
 
     @property
     def MAEPercent(self) :
         if self.IsNetworkComplete :
-            return self.GetOutputLayer().GetMeanAbsoluteErrorAsPercent()
+            return round( self.GetOutputLayer().GetMeanAbsoluteErrorAsPercent() * 100 ) / 100
         return 0.0
 
     @property
@@ -696,7 +696,7 @@ class MicroMLP :
     def _propagateSignal(self) :
         if self.IsNetworkComplete :
             for layer in self._layers :
-                if type(layer) != 'InputLayer' :
+                if type(layer) != MicroMLP.InputLayer :
                     layer.ComputeLayerValues()
             return True
         return False

@@ -21,6 +21,12 @@ Use deep learning for :
 | Create | `mlp = MicroMLP.Create(neuronsByLayers, activateFunctionName, layersAutoConnectFunction=None)` |
 | LoadFromFile | `mlp = MicroMLP.LoadFromFile(filename)` |
 
+### Using *MicroMLP* speedly creation of a neural network :
+```python
+from microMLP import MicroMLP
+mlp = MicroMLP.Create([3, 10, 2], "Sigmoid", MicroMLP.LayersFullConnect)
+```
+
 ### Using *MicroMLP* main class :
 
 | Name | Function |
@@ -51,10 +57,35 @@ Use deep learning for :
 | MAEPercent | `mlp.MAEPercent` | get |
 | ExamplesCount | `mlp.ExamplesCount` | get |
 
+### Using *MicroMLP* to learn the XOr problem :
+```python
+from microMLP import MicroMLP
+
+mlp = MicroMLP.Create( [2, 5, 1],
+                       MicroMLP.ACTFUNC_SIGMOID,
+                       MicroMLP.LayersFullConnect )
+
+nnFalse = MicroMLP.NNValue.FromBool(False)
+nnTrue  = MicroMLP.NNValue.FromBool(True)
+
+mlp.AddExample([nnFalse, nnFalse], [nnFalse])
+mlp.AddExample([nnFalse, nnTrue ], [nnTrue ])
+mlp.AddExample([nnTrue , nnTrue ], [nnFalse])
+mlp.AddExample([nnTrue , nnFalse], [nnTrue ])
+
+learnCount = mlp.LearnExamples(1)
+print("MSE: %s%%, MAE: %s%%" % (mlp.MSEPercent, mlp.MAEPercent))
+
+print(mlp.Predict([nnFalse, nnFalse])[0].AsBool)
+print(mlp.Predict([nnFalse, nnTrue] )[0].AsBool)
+print(mlp.Predict([nnTrue , nnTrue] )[0].AsBool)
+print(mlp.Predict([nnTrue , nnFalse])[0].AsBool)
+```
+
 | Variable | Default |
 | - | - |
 | `MicroMLP.Eta` | 0.30 |
-| `MicroMLP.Alpha` | 0.75 |
+| `MicroMLP.Alpha` | 0.85 |
 | `MicroMLP.Gain` | 2.70 |
 
 | Graphe | Activation function name | Const | Detail |
