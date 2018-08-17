@@ -26,18 +26,18 @@ Use deep learning for :
 | Name | Function |
 | - | - |
 | Constructor | `mlp = MicroMLP(activateFunctionName)` |
-| GetLayer | `mlp.GetLayer(layerIndex)` |
-| GetLayerIndex | `mlp.GetLayerIndex(layer)` |
+| GetLayer | `layer = mlp.GetLayer(layerIndex)` |
+| GetLayerIndex | `idx = mlp.GetLayerIndex(layer)` |
 | RemoveLayer | `mlp.RemoveLayer(layer)` |
-| GetInputLayer | `mlp.GetInputLayer()` |
-| GetOutputLayer | `mlp.GetOutputLayer()` |
-| Learn | `mlp.Learn(inputVectorNNValues, targetVectorNNValues)` |
-| Test | `mlp.Test(inputVectorNNValues, targetVectorNNValues)` |
-| Predict | `mlp.GetLayer(inputVectorNNValues)` |
-| SaveToFile | `mlp.GetLayer(filename)` |
-| AddExample | `mlp.AddExample(inputVectorNNValues, targetVectorNNValues)` |
+| GetInputLayer | `inputLayer = mlp.GetInputLayer()` |
+| GetOutputLayer | `outputLayer = mlp.GetOutputLayer()` |
+| Learn | `ok = mlp.Learn(inputVectorNNValues, targetVectorNNValues)` |
+| Test | `ok = mlp.Test(inputVectorNNValues, targetVectorNNValues)` |
+| Predict | `outputVectorNNValues = mlp.Predict(inputVectorNNValues)` |
+| SaveToFile | `ok = mlp.SaveToFile(filename)` |
+| AddExample | `ok = mlp.AddExample(inputVectorNNValues, targetVectorNNValues)` |
 | ClearExamples | `mlp.ClearExamples()` |
-| LearnExamples | `mlp.LearnExamples(timeInSec)` |
+| LearnExamples | `learnCount = mlp.LearnExamples(timeInSec)` |
 
 | Property | Example | Read/Write |
 | - | - | - |
@@ -74,17 +74,17 @@ Use deep learning for :
 | Name | Function |
 | - | - |
 | Constructor | `layer = MicroMLP.Layer(parentMicroMLP, neuronsCount=0, activateFunctionName=None)` |
-| GetLayerIndex | `layer.GetLayerIndex()` |
-| GetNeuron | `layer.GetNeuron(neuronIndex)` |
-| GetNeuronIndex | `layer.GetNeuronIndex(neuron)` |
+| GetLayerIndex | `idx = layer.GetLayerIndex()` |
+| GetNeuron | `neuron = layer.GetNeuron(neuronIndex)` |
+| GetNeuronIndex | `idx = layer.GetNeuronIndex(neuron)` |
 | AddNeuron | `layer.AddNeuron(neuron)` |
 | RemoveNeuron | `layer.RemoveNeuron(neuron)` |
 | ComputeLayerValues | `layer.ComputeLayerValues()` |
 | ComputeLayerErrors | `layer.ComputeLayerErrors(training=False)` |
-| GetMeanSquareError | `layer.GetMeanSquareError()` |
-| GetMeanAbsoluteError | `layer.GetMeanAbsoluteError()` |
-| GetMeanSquareErrorAsPercent | `layer.GetMeanSquareErrorAsPercent()` |
-| GetMeanAbsoluteErrorAsPercent | `layer.GetMeanAbsoluteErrorAsPercent()` |
+| GetMeanSquareError | `mse = layer.GetMeanSquareError()` |
+| GetMeanAbsoluteError | `mae = layer.GetMeanAbsoluteError()` |
+| GetMeanSquareErrorAsPercent | `mseP = layer.GetMeanSquareErrorAsPercent()` |
+| GetMeanAbsoluteErrorAsPercent | `maeP = layer.GetMeanAbsoluteErrorAsPercent()` |
 | Remove | `layer.Remove()` |
 
 | Property | Example | Read/Write |
@@ -99,24 +99,24 @@ Use deep learning for :
 | Name | Function |
 | - | - |
 | Constructor | `inputLayer = MicroMLP.InputLayer(parentMicroMLP, neuronsCount=0)` |
-| SetInputVectorNNValues | `inputLayer.SetInputVectorNNValues(inputVectorNNValues)` |
+| SetInputVectorNNValues | `ok = inputLayer.SetInputVectorNNValues(inputVectorNNValues)` |
 
 ### Using *MicroMLP.OutputLayer(Layer)* class :
 
 | Name | Function |
 | - | - |
 | Constructor | `outputLayer = MicroMLP.OutputLayer(parentMicroMLP, neuronsCount=0, activateFunctionName=None)` |
-| GetOutputVectorNNValues | `outputLayer.GetOutputVectorNNValues()` |
-| ComputeTargetLayerError | `outputLayer.ComputeTargetLayerError(targetVectorNNValues)` |
+| GetOutputVectorNNValues | `outputVectorNNValues = outputLayer.GetOutputVectorNNValues()` |
+| ComputeTargetLayerError | `ok = outputLayer.ComputeTargetLayerError(targetVectorNNValues)` |
 
 ### Using *MicroMLP.Neuron* class :
 
 | Name | Function |
 | - | - |
 | Constructor | `neuron = MicroMLP.Neuron(parentLayer, activateFunctionName)` |
-| GetNeuronIndex | `neuron.GetNeuronIndex()` |
-| GetInputConnections | `neuron.GetInputConnections()` |
-| GetOutputConnections | `neuron.GetOutputConnections()` |
+| GetNeuronIndex | `idx = neuron.GetNeuronIndex()` |
+| GetInputConnections | `connections = neuron.GetInputConnections()` |
+| GetOutputConnections | `connections = neuron.GetOutputConnections()` |
 | AddInputConnection | `neuron.AddInputConnection(connection)` |
 | AddOutputConnection | `neuron.AddOutputConnection(connection)` |
 | RemoveInputConnection | `neuron.RemoveInputConnection(connection)` |
@@ -170,12 +170,12 @@ Use deep learning for :
 
 | Property | Example | Read/Write |
 | - | - | - |
-| AsFloat | `nnvalue.AsFloat` | get / set |
-| AsInt | `nnvalue.AsInt` | get / set |
-| AsPercent | `nnvalue.AsPercent` | get / set |
-| AsByte | `nnvalue.AsByte` | get / set |
-| AsBool | `nnvalue.AsBool` | get / set |
-| AsAnalogSignal | `nnvalue.AsAnalogSignal` | get / set |
+| AsFloat | `nnvalue.AsFloat = 639.513` | get / set |
+| AsInt | `nnvalue.AsInt = 12345` | get / set |
+| AsPercent | `nnvalue.AsPercent = 65` | get / set |
+| AsByte | `nnvalue.AsByte = b'\x75'` | get / set |
+| AsBool | `nnvalue.AsBool = True` | get / set |
+| AsAnalogSignal | `nnvalue.AsAnalogSignal = 0.39472` | get / set |
 
 
 
