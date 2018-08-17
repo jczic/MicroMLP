@@ -39,7 +39,7 @@ Use deep learning for :
 | ClearExamples | `mlp.ClearExamples()` |
 | LearnExamples | `mlp.LearnExamples(timeInSec)` |
 
-| Name  | Property |
+| Property  | Example |
 | - | - |
 | Layers | `mlp.Layers` |
 | LayersCount | `mlp.LayersCount` |
@@ -51,15 +51,15 @@ Use deep learning for :
 | MAEPercent | `mlp.MAEPercent` |
 | ExamplesCount | `mlp.ExamplesCount` |
 
-| Activation function names |
-| 'Binary' |
-| 'Sigmoid' |
-| 'Tanh' |
-| 'ReLU' |
-| 'Gaussian' |
+| Activation function name | Name |
+| 'Binary' | Binary step |
+| 'Sigmoid' | Logistic (sigmoid or soft step) |
+| 'Tanh' | Hyperbolic tangent |
+| 'ReLU' | Rectified linear unit |
+| 'Gaussian' | Gaussian function |
 
-| Layers auto-connect functions |
-| MicroMLP.LayersFullConnect |
+| Layers auto-connect function | Detail |
+| MicroMLP.LayersFullConnect | Network fully connected |
 
 
 ### By JC`zic for [HC²](https://www.hc2.fr) ;')
