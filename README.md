@@ -1,4 +1,4 @@
-## MicroMLP is a micro neural network multilayer perceptron (principally used on ESP32 and [Pycom](http://www.pycom.io) modules)
+## MicroMLP is a micro artificial neural network multilayer perceptron (principally used on ESP32 and [Pycom](http://www.pycom.io) modules)
 
 ![HC²](hc2.png "HC²")
 
@@ -43,7 +43,7 @@ mlp = MicroMLP.Create([3, 10, 2], "Sigmoid", MicroMLP.LayersFullConnect)
 | SaveToFile | `ok = mlp.SaveToFile(filename)` |
 | AddExample | `ok = mlp.AddExample(inputVectorNNValues, targetVectorNNValues)` |
 | ClearExamples | `mlp.ClearExamples()` |
-| LearnExamples | `learnCount = mlp.LearnExamples(timeInSec)` |
+| LearnExamples | `learnCount = mlp.LearnExamples(maxSeconds=30, maxCount=None, stopWhenLearned=True, printMseMae=True)` |
 
 | Property | Example | Read/Write |
 | - | - | - |
@@ -62,7 +62,7 @@ mlp = MicroMLP.Create([3, 10, 2], "Sigmoid", MicroMLP.LayersFullConnect)
 from microMLP import MicroMLP
 
 mlp = MicroMLP.Create( [2, 5, 1],
-                       MicroMLP.ACTFUNC_SIGMOID,
+                       MicroMLP.ACTFUNC_TANH,
                        MicroMLP.LayersFullConnect )
 
 nnFalse = MicroMLP.NNValue.FromBool(False)
@@ -73,8 +73,7 @@ mlp.AddExample([nnFalse, nnTrue ], [nnTrue ])
 mlp.AddExample([nnTrue , nnTrue ], [nnFalse])
 mlp.AddExample([nnTrue , nnFalse], [nnTrue ])
 
-learnCount = mlp.LearnExamples(1)
-print("MSE: %s%%, MAE: %s%%" % (mlp.MSEPercent, mlp.MAEPercent))
+learnCount = mlp.LearnExamples()
 
 print(mlp.Predict([nnFalse, nnFalse])[0].AsBool)
 print(mlp.Predict([nnFalse, nnTrue] )[0].AsBool)
@@ -84,9 +83,10 @@ print(mlp.Predict([nnTrue , nnFalse])[0].AsBool)
 
 | Variable | Default |
 | - | - |
-| `MicroMLP.Eta` | 0.30 |
-| `MicroMLP.Alpha` | 0.85 |
-| `MicroMLP.Gain` | 2.70 |
+| `mlp.Eta` | 0.30 |
+| `mlp.Alpha` | 0.85 |
+| `mlp.Gain` | 2.30 |
+| `mlp.CorrectLearnedMAE` | 0.02 |
 
 | Graphe | Activation function name | Const | Detail |
 | - | - | - | - |

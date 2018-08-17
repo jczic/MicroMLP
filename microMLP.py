@@ -15,15 +15,17 @@ except :
 
 class MicroMLP :
 
-    ACTFUNC_BINARY   = 'Binary'
-    ACTFUNC_SIGMOID  = 'Sigmoid'
-    ACTFUNC_TANH     = 'TanH'
-    ACTFUNC_RELU     = 'ReLU'
-    ACTFUNC_GAUSSIAN = 'Gaussian'
+    ACTFUNC_BINARY      = 'Binary'
+    ACTFUNC_SIGMOID     = 'Sigmoid'
+    ACTFUNC_TANH        = 'TanH'
+    ACTFUNC_RELU        = 'ReLU'
+    ACTFUNC_GAUSSIAN    = 'Gaussian'
 
-    Eta              = 0.30
-    Alpha            = 0.85
-    Gain             = 2.70
+    Eta                 = 0.30
+    Alpha               = 0.85
+    Gain                = 2.30
+
+    CorrectLearnedMAE   = 0.02
 
     # -------------------------------------------------------------------------
     # --( Class : NNValue )----------------------------------------------------
@@ -329,7 +331,7 @@ class MicroMLP :
                 return 0
             mse = 0.0
             for n in self._neurons :
-                mse += n.ComputedDeltaError * n.ComputedDeltaError
+                mse += n.ComputedDeltaError ** 2
             return mse / len(self._neurons)
 
         def GetMeanAbsoluteError(self) :
@@ -341,10 +343,10 @@ class MicroMLP :
             return mae / len(self._neurons)
 
         def GetMeanSquareErrorAsPercent(self) :
-            return self.GetMeanSquareError() * 100
+            return round( self.GetMeanSquareError() * 100 * 1000 ) / 1000
 
         def GetMeanAbsoluteErrorAsPercent(self) :
-            return self.GetMeanAbsoluteError() * 100
+            return round( self.GetMeanAbsoluteError() * 100 * 1000 ) / 1000
 
         def Remove(self) :
             while len(self._neurons) > 0 :
@@ -474,7 +476,9 @@ class MicroMLP :
     @staticmethod
     def BinaryActivation(sum, gain) :
         x = sum * gain
-        return 1.0 if (x >= 0) else 0.0
+        s = 1.0 if (x >= 0) else 0.0
+        print("x=%s, s=%s" % (x, s))
+        return s
 
     @staticmethod
     def SigmoidActivation(sum, gain) :
@@ -631,17 +635,26 @@ class MicroMLP :
     def ClearExamples(self) :
         self._examples.clear()
 
-    def LearnExamples(self, timeInSec) :
-        if self.ExamplesCount > 0 and timeInSec > 0 :
-            count   = 0
-            endTime = time() + timeInSec
-            while time() < endTime :
+    def LearnExamples(self, maxSeconds=30, maxCount=None, stopWhenLearned=True, printMseMae=True) :
+        if self.ExamplesCount > 0 and maxSeconds > 0 :
+            count      = 0
+            averageMAE = 0.99
+            endTime    = time() + maxSeconds
+            while time() < endTime and \
+                  ( maxCount is None or count < maxCount ) :
                 idx                  = int( MicroMLP.RandomFloat() * self.ExamplesCount )
                 inputVectorNNValues  = self._examples[idx]['Input']
                 targetVectorNNValues = self._examples[idx]['Output']
                 if not self.Learn(inputVectorNNValues, targetVectorNNValues) :
                     return 0
                 count += 1
+                if printMseMae :
+                    print( "[ STEP : %s ] , [ MSE : %s%% ] , [ MAE : %s%% ]"
+                           % (count, self.MSEPercent, self.MAEPercent) )
+                if stopWhenLearned :
+                    averageMAE = (averageMAE + self.MAE) / 2
+                    if averageMAE <= self.CorrectLearnedMAE :
+                        break
             return count
         return 0
 
@@ -678,13 +691,13 @@ class MicroMLP :
     @property
     def MSEPercent(self) :
         if self.IsNetworkComplete :
-            return round( self.GetOutputLayer().GetMeanSquareErrorAsPercent() * 100 ) / 100
+            return self.GetOutputLayer().GetMeanSquareErrorAsPercent()
         return 0.0
 
     @property
     def MAEPercent(self) :
         if self.IsNetworkComplete :
-            return round( self.GetOutputLayer().GetMeanAbsoluteErrorAsPercent() * 100 ) / 100
+            return self.GetOutputLayer().GetMeanAbsoluteErrorAsPercent()
         return 0.0
 
     @property
