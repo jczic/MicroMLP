@@ -230,7 +230,7 @@ class MicroMLP :
             for conn in self._inputConnections :
                 sum += conn.NeuronSrc.ComputedValue * conn.Weight
             if self._activateFunction :
-                self._computedValue = self._activateFunction(sum, self._parentLayer.ParentMicroMLP.Gain)
+                self._computedValue = self._activateFunction(sum * self._parentLayer.ParentMicroMLP.Gain)
 
         def ApplyError(self, deltaError) :
             self._computedError      = self._parentLayer.ParentMicroMLP.Gain             \
@@ -473,29 +473,24 @@ class MicroMLP :
         return random()
 
     @staticmethod
-    def BinaryActivation(sum, gain) :
-        x = sum * gain
+    def BinaryActivation(x) :
         return 1.0 if (x >= 0) else 0.0
 
     @staticmethod
-    def SigmoidActivation(sum, gain) :
-        x = sum * gain
+    def SigmoidActivation(x) :
         return 1.0 / ( 1.0 + exp(-x) )
 
     @staticmethod
-    def TanHActivation(sum, gain) :
-        x    = sum * gain
+    def TanHActivation(x) :
         tanh = 2.0 / (1.0 + exp(-2.0 * x)) - 1.0
         return (tanh / 2.0) + 0.5
 
     @staticmethod
-    def ReLUActivation(sum, gain) :
-        x = sum * gain
+    def ReLUActivation(x) :
         return x if x >= 0 else 0.0
 
     @staticmethod
-    def GaussianActivation(sum, gain) :
-        x = sum * gain
+    def GaussianActivation(x) :
         return exp(-x ** 2)
 
     @staticmethod
