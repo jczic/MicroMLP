@@ -43,7 +43,7 @@ mlp = MicroMLP.Create([3, 10, 2], "Sigmoid", MicroMLP.LayersFullConnect)
 | SaveToFile | `ok = mlp.SaveToFile(filename)` |
 | AddExample | `ok = mlp.AddExample(inputVectorNNValues, targetVectorNNValues)` |
 | ClearExamples | `mlp.ClearExamples()` |
-| LearnExamples | `learnCount = mlp.LearnExamples(maxSeconds=30, maxCount=None, stopWhenLearned=True, printMseMae=True)` |
+| LearnExamples | `learnCount = mlp.LearnExamples(maxSeconds=30, maxCount=None, stopWhenLearned=True, printMAEAverage=True)` |
 
 | Property | Example | Read/Write |
 | - | - | - |
@@ -111,7 +111,7 @@ print(mlp.Predict([nnTrue , nnFalse])[0].AsBool)
 | AddNeuron | `layer.AddNeuron(neuron)` |
 | RemoveNeuron | `layer.RemoveNeuron(neuron)` |
 | ComputeLayerValues | `layer.ComputeLayerValues()` |
-| ComputeLayerErrors | `layer.ComputeLayerErrors(training=False)` |
+| ComputeLayerErrors | `layer.ComputeLayerErrors()` |
 | GetMeanSquareError | `mse = layer.GetMeanSquareError()` |
 | GetMeanAbsoluteError | `mae = layer.GetMeanAbsoluteError()` |
 | GetMeanSquareErrorAsPercent | `mseP = layer.GetMeanSquareErrorAsPercent()` |
@@ -155,7 +155,7 @@ print(mlp.Predict([nnTrue , nnFalse])[0].AsBool)
 | SetComputedNNValue | `neuron.SetComputedNNValue(nnvalue)` |
 | ComputeValue | `neuron.ComputeValue()` |
 | ApplyError | `neuron.ApplyError(deltaError)` |
-| ComputeError | `neuron.ComputeError(training=False)` |
+| ComputeError | `neuron.ComputeError()` |
 | Remove | `neuron.Remove()` |
 
 | Property | Example | Read/Write |
@@ -171,7 +171,7 @@ print(mlp.Predict([nnTrue , nnFalse])[0].AsBool)
 | Name | Function |
 | - | - |
 | Constructor | `connection = MicroMLP.Connection(neuronSrc, neuronDst, weight=None)` |
-| ComputeWeight | `connection.ComputeWeight(eta, alpha)` |
+| UpdateWeight | `connection.UpdateWeight(eta, alpha)` |
 | Remove | `connection.Remove()` |
 
 | Property | Example | Read/Write |

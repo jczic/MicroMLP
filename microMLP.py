@@ -147,7 +147,7 @@ class MicroMLP :
 
         # -[ Public functions ]---------------------------------
 
-        def ComputeWeight(self, eta, alpha) :
+        def UpdateWeight(self, eta, alpha) :
             w = eta * self._neuronSrc.ComputedValue * self._neuronDst.ComputedError
             self._weight         += w + (alpha * self._momentumWeight)
             self._momentumWeight  = w
@@ -238,13 +238,12 @@ class MicroMLP :
                                      * deltaError;
             self._computedDeltaError = deltaError;
 
-        def ComputeError(self, training=False) :
+        def ComputeError(self) :
             deltaError = 0.0
             for conn in self._outputConnections :
                 deltaError += conn.NeuronDst.ComputedError * conn.Weight
-                if training :
-                    conn.ComputeWeight( self._parentLayer.ParentMicroMLP.Eta,
-                                        self._parentLayer.ParentMicroMLP.Alpha )
+                conn.UpdateWeight( self._parentLayer.ParentMicroMLP.Eta,
+                                   self._parentLayer.ParentMicroMLP.Alpha )
             self.ApplyError(deltaError)
 
         def Remove(self) :
@@ -322,9 +321,9 @@ class MicroMLP :
             for n in self._neurons :
                 n.ComputeValue()
 
-        def ComputeLayerErrors(self, training=False) :
+        def ComputeLayerErrors(self) :
             for n in self._neurons :
-                n.ComputeError(training)
+                n.ComputeError()
 
         def GetMeanSquareError(self) :
             if len(self._neurons) == 0 :
@@ -625,7 +624,7 @@ class MicroMLP :
            len(targetVectorNNValues) == self.GetOutputLayer().NeuronsCount :
            self._examples.append( {
                 'Input'  : inputVectorNNValues,
-                'Output' : targetVectorNNValues
+                'Target' : targetVectorNNValues
            } )
            return True
         return False
@@ -633,25 +632,27 @@ class MicroMLP :
     def ClearExamples(self) :
         self._examples.clear()
 
-    def LearnExamples(self, maxSeconds=30, maxCount=None, stopWhenLearned=True, printMseMae=True) :
+    def LearnExamples(self, maxSeconds=30, maxCount=None, stopWhenLearned=True, printMAEAverage=True) :
         if self.ExamplesCount > 0 and maxSeconds > 0 :
-            count      = 0
-            averageMAE = 0.99
-            endTime    = time() + maxSeconds
+            count   = 0
+            endTime = time() + maxSeconds
             while time() < endTime and \
                   ( maxCount is None or count < maxCount ) :
-                idx                  = int( MicroMLP.RandomFloat() * self.ExamplesCount )
-                inputVectorNNValues  = self._examples[idx]['Input']
-                targetVectorNNValues = self._examples[idx]['Output']
-                if not self.Learn(inputVectorNNValues, targetVectorNNValues) :
+                idx = int( MicroMLP.RandomFloat() * self.ExamplesCount )
+                if not self.Learn( self._examples[idx]['Input'],
+                                   self._examples[idx]['Target'] ) :
                     return 0
                 count += 1
-                if printMseMae :
-                    print( "[ STEP : %s ] , [ MSE : %s%% ] , [ MAE : %s%% ]"
-                           % (count, self.MSEPercent, self.MAEPercent) )
-                if stopWhenLearned :
-                    averageMAE = (averageMAE + self.MAE) / 2
-                    if averageMAE <= self.CorrectLearnedMAE :
+                if (stopWhenLearned or printMAEAverage) and count % 10 == 0 :
+                    maeAvg = 0.0
+                    for ex in self._examples :
+                        self.Test(ex['Input'], ex['Target'])
+                        maeAvg += self.MAE
+                    maeAvg /= self.ExamplesCount
+                    if printMAEAverage :
+                        print( "[ STEP : %s , MAE : %s%% ]"
+                               % ( count, round(maeAvg*100*1000)/1000 ) )
+                    if stopWhenLearned and maeAvg <= self.CorrectLearnedMAE :
                         break
             return count
         return 0
@@ -712,11 +713,11 @@ class MicroMLP :
             return True
         return False
 
-    def _backPropagateError(self, training=False) :
+    def _backPropagateError(self) :
         if self.IsNetworkComplete :
             idx = len(self._layers)-2
             while idx >= 0 :
-                self._layers[idx].ComputeLayerErrors(training)
+                self._layers[idx].ComputeLayerErrors()
                 idx -= 1
             return True
         return False
@@ -725,9 +726,11 @@ class MicroMLP :
         if self.IsNetworkComplete and self.GetInputLayer().SetInputVectorNNValues(inputVectorNNValues) :
             self._propagateSignal()
             if not targetVectorNNValues :
-                return True
+                return not training
             if self.GetOutputLayer().ComputeTargetLayerError(targetVectorNNValues) :
-                return self._backPropagateError(training)
+                if not training :
+                    return True
+                return self._backPropagateError()
         return False
 
     # -------------------------------------------------------------------------
