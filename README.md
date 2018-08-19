@@ -27,7 +27,7 @@
 - Approximation (unknown function, complex function)
 
 <p align="center">
-    <img src="nn.png">
+    <img src="hc2-deep-learning.png">
 </p>
 
 ### Using *MicroMLP* static functions :
