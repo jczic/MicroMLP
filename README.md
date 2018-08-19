@@ -2,10 +2,10 @@
 
 ![HC²](hc2.png "HC²")
 
-####Very easy to integrate and very light with one file only :
+#### Very easy to integrate and very light with one file only :
 - `"microMLP.py"`
 
-####Use deep learning for :
+#### Use deep learning for :
 - Signal processing (speech processing, identification, filtering)
 - Image processing (compression, recognition, patterns)
 - Control (diagnosis, quality control, robotics)
