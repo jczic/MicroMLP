@@ -22,7 +22,7 @@
 
 | Name | Function |
 | - | - |
-| Create | `mlp = MicroMLP.Create(neuronsByLayers, activateFunctionName, layersAutoConnectFunction=None)` |
+| Create | `mlp = MicroMLP.Create(neuronsByLayers, activateFunctionName, layersAutoConnectFunction=None, useBiasValue=1.0)` |
 | LoadFromFile | `mlp = MicroMLP.LoadFromFile(filename)` |
 
 ### Using *MicroMLP* speedly creation of a neural network :
@@ -61,14 +61,13 @@ mlp = MicroMLP.Create([3, 10, 2], "Sigmoid", MicroMLP.LayersFullConnect)
 | MAEPercent | `mlp.MAEPercent` | get |
 | ExamplesCount | `mlp.ExamplesCount` | get |
 
-### Using *MicroMLP* to learn the XOr problem :
+### Using *MicroMLP* to learn the XOr problem (with hyperbolic tangent) :
 ```python
 from microMLP import MicroMLP
 
-mlp = MicroMLP.Create( neuronsByLayers           = [2, 3, 1],
-                       activateFunctionName      = MicroMLP.ACTFUNC_BINARY,
+mlp = MicroMLP.Create( neuronsByLayers           = [2, 5, 1],
+                       activateFunctionName      = MicroMLP.ACTFUNC_TANH,
                        layersAutoConnectFunction = MicroMLP.LayersFullConnect )
-mlp.Gain = 10
 
 nnFalse  = MicroMLP.NNValue.FromBool(False)
 nnTrue   = MicroMLP.NNValue.FromBool(True)
@@ -85,6 +84,9 @@ print( "  - False xor False = %s" % mlp.Predict([nnFalse, nnFalse])[0].AsBool )
 print( "  - False xor True  = %s" % mlp.Predict([nnFalse, nnTrue] )[0].AsBool )
 print( "  - True  xor True  = %s" % mlp.Predict([nnTrue , nnTrue] )[0].AsBool )
 print( "  - True  xor False = %s" % mlp.Predict([nnTrue , nnFalse])[0].AsBool )
+
+if mlp.SaveToFile("mlp.json") :
+	print( "MicroMLP structure saved!" )
 ```
 
 | Variable | Default |
@@ -96,7 +98,7 @@ print( "  - True  xor False = %s" % mlp.Predict([nnTrue , nnFalse])[0].AsBool )
 
 | Graphe | Activation function name | Const | Detail |
 | - | - | - | - |
-| ![HC²](graphe_binary.png "Binary step") | `"Binary"` | MicroMLP.ACTFUNC_BINARY | Binary step |
+| ![HC²](graphe_heaviside.png "Heaviside binary step") | `"Heaviside"` | MicroMLP.ACTFUNC_HEAVISIDE | Heaviside binary step |
 | ![HC²](graphe_sigmoid.png "Logistic (sigmoid or soft step)") | `"Sigmoid"` | MicroMLP.ACTFUNC_SIGMOID | Logistic (sigmoid or soft step) |
 | ![HC²](graphe_tanh.png "Hyperbolic tangent") | `"TanH"` | MicroMLP.ACTFUNC_TANH | Hyperbolic tangent |
 | ![HC²](graphe_relu.png "Rectified linear unit") | `"ReLU"` | MicroMLP.ACTFUNC_RELU | Rectified linear unit |
@@ -156,6 +158,8 @@ print( "  - True  xor False = %s" % mlp.Predict([nnTrue , nnFalse])[0].AsBool )
 | AddOutputConnection | `neuron.AddOutputConnection(connection)` |
 | RemoveInputConnection | `neuron.RemoveInputConnection(connection)` |
 | RemoveOutputConnection | `neuron.RemoveOutputConnection(connection)` |
+| SetBias | `neuron.SetBias(bias)` |
+| GetBias | `neuron.GetBias()` |
 | SetComputedNNValue | `neuron.SetComputedNNValue(nnvalue)` |
 | ComputeValue | `neuron.ComputeValue()` |
 | ComputeError | `neuron.ComputeError(targetNNValue=None)` |
@@ -182,6 +186,20 @@ print( "  - True  xor False = %s" % mlp.Predict([nnTrue , nnFalse])[0].AsBool )
 | NeuronSrc | `connection.NeuronSrc` | get |
 | NeuronDst | `connection.NeuronDst` | get |
 | Weight | `connection.Weight` | get |
+
+### Using *MicroMLP.Bias* class :
+
+| Name | Function |
+| - | - |
+| Constructor | `bias = MicroMLP.Bias(neuronDst, value=1.0, weight=None)` |
+| UpdateWeight | `bias.UpdateWeight(eta, alpha)` |
+| Remove | `bias.Remove()` |
+
+| Property | Example | Read/Write |
+| - | - | - |
+| NeuronDst | `bias.NeuronDst` | get |
+| Value | `bias.Value` | get |
+| Weight | `bias.Weight` | get |
 
 ### Using *MicroMLP.NNValue* static functions :
 
