@@ -5,6 +5,18 @@
 #### Very easy to integrate and very light with one file only :
 - `"microMLP.py"`
 
+#### MicroMLP features :
+- Modifiable multilayer structure
+- Integrated bias connections
+- Momentum weight included
+- Save and load all structure to/from json file
+- Various activation functions :
+  - Heaviside binary step
+  - Logistic (sigmoid or soft step)
+  - Hyperbolic tangent
+  - Rectified linear unit
+  - Gaussian function
+
 #### Use deep learning for :
 - Signal processing (speech processing, identification, filtering)
 - Image processing (compression, recognition, patterns)
