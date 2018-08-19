@@ -172,7 +172,7 @@ if mlp.SaveToFile("mlp.json") :
 | RemoveOutputConnection | `neuron.RemoveOutputConnection(connection)` |
 | SetBias | `neuron.SetBias(bias)` |
 | GetBias | `neuron.GetBias()` |
-| SetComputedNNValue | `neuron.SetComputedNNValue(nnvalue)` |
+| SetOutputNNValue | `neuron.SetOutputNNValue(nnvalue)` |
 | ComputeValue | `neuron.ComputeValue()` |
 | ComputeError | `neuron.ComputeError(targetNNValue=None)` |
 | Remove | `neuron.Remove()` |
@@ -181,7 +181,7 @@ if mlp.SaveToFile("mlp.json") :
 | - | - | - |
 | ParentLayer | `neuron.ParentLayer` | get |
 | ActivateFunctionName | `neuron.ActivateFunctionName` | get |
-| ComputedValue | `neuron.ComputedValue` | get |
+| ComputedOutput | `neuron.ComputedOutput` | get |
 | ComputedDeltaError | `neuron.ComputedDeltaError` | get |
 | ComputedSignalError | `neuron.ComputedSignalError` | get |
 

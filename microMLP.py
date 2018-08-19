@@ -148,7 +148,7 @@ class MicroMLP :
         # -[ Public functions ]---------------------------------
 
         def UpdateWeight(self, eta, alpha) :
-            w = eta * self._neuronSrc.ComputedValue * self._neuronDst.ComputedSignalError
+            w = eta * self._neuronSrc.ComputedOutput * self._neuronDst.ComputedSignalError
             self._weight         += w + (alpha * self._momentumWeight)
             self._momentumWeight  = w
 
@@ -196,7 +196,7 @@ class MicroMLP :
             self._inputConnections      = [ ]
             self._outputConnections     = [ ]
             self._inputBias             = None
-            self._computedValue         = 0.0
+            self._computedOutput        = 0.0
             self._computedDeltaError    = 0.0
             self._computedSignalError   = 0.0
 
@@ -229,21 +229,21 @@ class MicroMLP :
         def GetBias(self) :
         	return self._inputBias
 
-        def SetComputedNNValue(self, nnvalue) :
-            self._computedValue = nnvalue.AsAnalogSignal
+        def SetOutputNNValue(self, nnvalue) :
+            self._computedOutput = nnvalue.AsAnalogSignal
 
-        def ComputeValue(self) :
+        def ComputeOutput(self) :
             sum = 0.0
             for conn in self._inputConnections :
-                sum += conn.NeuronSrc.ComputedValue * conn.Weight
+                sum += conn.NeuronSrc.ComputedOutput * conn.Weight
             if self._inputBias :
             	sum += self._inputBias.Value * self._inputBias.Weight
             if self._activateFunction :
-                self._computedValue = self._activateFunction(sum * self._parentLayer.ParentMicroMLP.Gain)
+                self._computedOutput = self._activateFunction(sum * self._parentLayer.ParentMicroMLP.Gain)
 
         def ComputeError(self, targetNNValue=None) :
             if targetNNValue :
-                self._computedDeltaError = targetNNValue.AsAnalogSignal - self.ComputedValue
+                self._computedDeltaError = targetNNValue.AsAnalogSignal - self.ComputedOutput
             else :
                 self._computedDeltaError = 0.0
                 for conn in self._outputConnections :
@@ -251,7 +251,7 @@ class MicroMLP :
             if self._activateFunction :
                 self._computedSignalError = self._computedDeltaError              \
                                           * self._parentLayer.ParentMicroMLP.Gain \
-                                          * self._activateFunction( self._computedValue,
+                                          * self._activateFunction( self._computedOutput,
                                                                     derivative = True )
 
         def Remove(self) :
@@ -274,8 +274,8 @@ class MicroMLP :
             return self._activateFunctionName
 
         @property
-        def ComputedValue(self) :
-            return self._computedValue
+        def ComputedOutput(self) :
+            return self._computedOutput
 
         @property
         def ComputedDeltaError(self) :
@@ -437,7 +437,7 @@ class MicroMLP :
         def SetInputVectorNNValues(self, inputVectorNNValues) :
             if len(inputVectorNNValues) == self.NeuronsCount :
                 for i in range(self.NeuronsCount) :
-                    self._neurons[i].SetComputedNNValue(inputVectorNNValues[i])
+                    self._neurons[i].SetOutputNNValue(inputVectorNNValues[i])
                 return True
             return False
 
@@ -462,7 +462,7 @@ class MicroMLP :
         def GetOutputVectorNNValues(self) :
             nnvalues = [ ]
             for n in self._neurons :
-                nnvalues.append(MicroMLP.NNValue.FromAnalogSignal(n.ComputedValue))
+                nnvalues.append(MicroMLP.NNValue.FromAnalogSignal(n.ComputedOutput))
             return nnvalues
 
         def ComputeTargetLayerError(self, targetVectorNNValues) :
@@ -774,7 +774,7 @@ class MicroMLP :
             idx = 1
             while idx < self.LayersCount :
                 for n in self.GetLayer(idx).Neurons :
-                    n.ComputeValue()
+                    n.ComputeOutput()
                 idx += 1
             return True
         return False
