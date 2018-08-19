@@ -68,10 +68,10 @@ from microMLP import MicroMLP
 mlp = MicroMLP.Create( neuronsByLayers           = [2, 3, 1],
                        activateFunctionName      = MicroMLP.ACTFUNC_BINARY,
                        layersAutoConnectFunction = MicroMLP.LayersFullConnect )
-MicroMLP.Gain = 10
+mlp.Gain = 10
 
-nnFalse = MicroMLP.NNValue.FromBool(False)
-nnTrue  = MicroMLP.NNValue.FromBool(True)
+nnFalse  = MicroMLP.NNValue.FromBool(False)
+nnTrue   = MicroMLP.NNValue.FromBool(True)
 
 mlp.AddExample( [nnFalse, nnFalse], [nnFalse] )
 mlp.AddExample( [nnFalse, nnTrue ], [nnTrue ] )
