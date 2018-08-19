@@ -2,10 +2,10 @@
 
 ![HC²](hc2.png "HC²")
 
-Very easy to integrate and very light with one file only :
+####Very easy to integrate and very light with one file only :
 - `"microMLP.py"`
 
-Use deep learning for :
+####Use deep learning for :
 - Signal processing (speech processing, identification, filtering)
 - Image processing (compression, recognition, patterns)
 - Control (diagnosis, quality control, robotics)
@@ -13,6 +13,10 @@ Use deep learning for :
 - Simulation (black box simulation)
 - Classification (DNA analysis)
 - Approximation (unknown function, complex function)
+
+<p align="center">
+    <img src="nn.png">
+</p>
 
 ### Using *MicroMLP* static functions :
 
@@ -61,24 +65,26 @@ mlp = MicroMLP.Create([3, 10, 2], "Sigmoid", MicroMLP.LayersFullConnect)
 ```python
 from microMLP import MicroMLP
 
-mlp = MicroMLP.Create( [2, 5, 1],
-                       MicroMLP.ACTFUNC_TANH,
-                       MicroMLP.LayersFullConnect )
+mlp = MicroMLP.Create( neuronsByLayers           = [2, 3, 1],
+                       activateFunctionName      = MicroMLP.ACTFUNC_BINARY,
+                       layersAutoConnectFunction = MicroMLP.LayersFullConnect )
+MicroMLP.Gain = 10
 
 nnFalse = MicroMLP.NNValue.FromBool(False)
 nnTrue  = MicroMLP.NNValue.FromBool(True)
 
-mlp.AddExample([nnFalse, nnFalse], [nnFalse])
-mlp.AddExample([nnFalse, nnTrue ], [nnTrue ])
-mlp.AddExample([nnTrue , nnTrue ], [nnFalse])
-mlp.AddExample([nnTrue , nnFalse], [nnTrue ])
+mlp.AddExample( [nnFalse, nnFalse], [nnFalse] )
+mlp.AddExample( [nnFalse, nnTrue ], [nnTrue ] )
+mlp.AddExample( [nnTrue , nnTrue ], [nnFalse] )
+mlp.AddExample( [nnTrue , nnFalse], [nnTrue ] )
 
 learnCount = mlp.LearnExamples()
 
-print(mlp.Predict([nnFalse, nnFalse])[0].AsBool)
-print(mlp.Predict([nnFalse, nnTrue] )[0].AsBool)
-print(mlp.Predict([nnTrue , nnTrue] )[0].AsBool)
-print(mlp.Predict([nnTrue , nnFalse])[0].AsBool)
+print( "LEARNED :" )
+print( "  - False xor False = %s" % mlp.Predict([nnFalse, nnFalse])[0].AsBool )
+print( "  - False xor True  = %s" % mlp.Predict([nnFalse, nnTrue] )[0].AsBool )
+print( "  - True  xor True  = %s" % mlp.Predict([nnTrue , nnTrue] )[0].AsBool )
+print( "  - True  xor False = %s" % mlp.Predict([nnTrue , nnFalse])[0].AsBool )
 ```
 
 | Variable | Default |
@@ -110,8 +116,6 @@ print(mlp.Predict([nnTrue , nnFalse])[0].AsBool)
 | GetNeuronIndex | `idx = layer.GetNeuronIndex(neuron)` |
 | AddNeuron | `layer.AddNeuron(neuron)` |
 | RemoveNeuron | `layer.RemoveNeuron(neuron)` |
-| ComputeLayerValues | `layer.ComputeLayerValues()` |
-| ComputeLayerErrors | `layer.ComputeLayerErrors()` |
 | GetMeanSquareError | `mse = layer.GetMeanSquareError()` |
 | GetMeanAbsoluteError | `mae = layer.GetMeanAbsoluteError()` |
 | GetMeanSquareErrorAsPercent | `mseP = layer.GetMeanSquareErrorAsPercent()` |
@@ -154,8 +158,7 @@ print(mlp.Predict([nnTrue , nnFalse])[0].AsBool)
 | RemoveOutputConnection | `neuron.RemoveOutputConnection(connection)` |
 | SetComputedNNValue | `neuron.SetComputedNNValue(nnvalue)` |
 | ComputeValue | `neuron.ComputeValue()` |
-| ApplyError | `neuron.ApplyError(deltaError)` |
-| ComputeError | `neuron.ComputeError()` |
+| ComputeError | `neuron.ComputeError(targetNNValue=None)` |
 | Remove | `neuron.Remove()` |
 
 | Property | Example | Read/Write |
@@ -163,8 +166,8 @@ print(mlp.Predict([nnTrue , nnFalse])[0].AsBool)
 | ParentLayer | `neuron.ParentLayer` | get |
 | ActivateFunctionName | `neuron.ActivateFunctionName` | get |
 | ComputedValue | `neuron.ComputedValue` | get |
-| ComputedError | `neuron.ComputedError` | get |
 | ComputedDeltaError | `neuron.ComputedDeltaError` | get |
+| ComputedSignalError | `neuron.ComputedSignalError` | get |
 
 ### Using *MicroMLP.Connection* class :
 

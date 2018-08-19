@@ -148,7 +148,7 @@ class MicroMLP :
         # -[ Public functions ]---------------------------------
 
         def UpdateWeight(self, eta, alpha) :
-            w = eta * self._neuronSrc.ComputedValue * self._neuronDst.ComputedError
+            w = eta * self._neuronSrc.ComputedValue * self._neuronDst.ComputedSignalError
             self._weight         += w + (alpha * self._momentumWeight)
             self._momentumWeight  = w
 
@@ -196,8 +196,8 @@ class MicroMLP :
             self._inputConnections      = [ ]
             self._outputConnections     = [ ]
             self._computedValue         = 0.5
-            self._computedError         = 0.0
             self._computedDeltaError    = 0.0
+            self._computedSignalError   = 0.0
 
         # -[ Public functions ]---------------------------------
 
@@ -232,19 +232,18 @@ class MicroMLP :
             if self._activateFunction :
                 self._computedValue = self._activateFunction(sum * self._parentLayer.ParentMicroMLP.Gain)
 
-        def ApplyError(self, deltaError) :
-            self._computedError      = self._parentLayer.ParentMicroMLP.Gain             \
-                                     * self._computedValue * (1.0 - self._computedValue) \
-                                     * deltaError;
-            self._computedDeltaError = deltaError;
-
-        def ComputeError(self) :
-            deltaError = 0.0
-            for conn in self._outputConnections :
-                deltaError += conn.NeuronDst.ComputedError * conn.Weight
-                conn.UpdateWeight( self._parentLayer.ParentMicroMLP.Eta,
-                                   self._parentLayer.ParentMicroMLP.Alpha )
-            self.ApplyError(deltaError)
+        def ComputeError(self, targetNNValue=None) :
+            if targetNNValue :
+                self._computedDeltaError = targetNNValue.AsAnalogSignal - self.ComputedValue
+            else :
+                self._computedDeltaError = 0.0
+                for conn in self._outputConnections :
+                    self._computedDeltaError += conn.NeuronDst.ComputedSignalError * conn.Weight
+            if self._activateFunction :
+                self._computedSignalError = self._computedDeltaError              \
+                                          * self._parentLayer.ParentMicroMLP.Gain \
+                                          * self._activateFunction( self._computedValue,
+                                                                    derivative = True )
 
         def Remove(self) :
             for conn in self._inputConnections :
@@ -270,12 +269,12 @@ class MicroMLP :
             return self._computedValue
 
         @property
-        def ComputedError(self) :
-            return self._computedError
-
-        @property
         def ComputedDeltaError(self) :
             return self._computedDeltaError
+
+        @property
+        def ComputedSignalError(self) :
+            return self._computedSignalError
 
     # -------------------------------------------------------------------------
     # -------------------------------------------------------------------------
@@ -316,14 +315,6 @@ class MicroMLP :
 
         def RemoveNeuron(self, neuron) :
             self._neurons.remove(neuron)
-
-        def ComputeLayerValues(self) :
-            for n in self._neurons :
-                n.ComputeValue()
-
-        def ComputeLayerErrors(self) :
-            for n in self._neurons :
-                n.ComputeError()
 
         def GetMeanSquareError(self) :
             if len(self._neurons) == 0 :
@@ -424,8 +415,7 @@ class MicroMLP :
         def ComputeTargetLayerError(self, targetVectorNNValues) :
             if len(targetVectorNNValues) == self.NeuronsCount :
                 for i in range(self.NeuronsCount) :
-                    deltaError = targetVectorNNValues[i].AsAnalogSignal - self._neurons[i].ComputedValue
-                    self._neurons[i].ApplyError(deltaError)
+                    self._neurons[i].ComputeError(targetVectorNNValues[i])
                 return True
             return False
 
@@ -437,7 +427,7 @@ class MicroMLP :
 
     def __init__(self, activateFunctionName) :
         if not MicroMLP.GetActivationFunction(activateFunctionName) :
-            raise Exception('MicroMLP : Unknow activateFunctionName (%s).' % activateFunctionName)
+            raise Exception('MicroMLP : Unknow activateFunctionName "%s".' % activateFunctionName)
         self._activateFunctionName = activateFunctionName
         self._layers               = [ ]
         self._examples             = [ ]
@@ -473,24 +463,35 @@ class MicroMLP :
         return random()
 
     @staticmethod
-    def BinaryActivation(x) :
-        return 1.0 if (x >= 0) else 0.0
+    def BinaryActivation(x, derivative=False) :
+        if derivative :
+            return 1.0
+        return 1.0 if x >= 0 else 0.0
 
     @staticmethod
-    def SigmoidActivation(x) :
+    def SigmoidActivation(x, derivative=False) :
+        if derivative :
+            return x * (1.0-x)
         return 1.0 / ( 1.0 + exp(-x) )
 
     @staticmethod
-    def TanHActivation(x) :
+    def TanHActivation(x, derivative=False) :
+        if derivative :
+            x = (x - 0.5) * 2
+            return 1.0 - (x ** 2)         
         tanh = 2.0 / (1.0 + exp(-2.0 * x)) - 1.0
         return (tanh / 2.0) + 0.5
 
     @staticmethod
-    def ReLUActivation(x) :
+    def ReLUActivation(x, derivative=False) :
+        if derivative :
+            return 1.0
         return x if x >= 0 else 0.0
 
     @staticmethod
-    def GaussianActivation(x) :
+    def GaussianActivation(x, derivative=False) :
+        if derivative :
+            return x * (1.0-x)
         return exp(-x ** 2)
 
     @staticmethod
@@ -645,7 +646,7 @@ class MicroMLP :
                         maeAvg += self.MAE
                     maeAvg /= self.ExamplesCount
                     if printMAEAverage :
-                        print( "[ STEP : %s , MAE : %s%% ]"
+                        print( "[ STEP : %s / ERROR : %s%% ]"
                                % ( count, round(maeAvg*100*1000)/1000 ) )
                     if stopWhenLearned and maeAvg <= self.CorrectLearnedMAE :
                         break
@@ -702,17 +703,22 @@ class MicroMLP :
 
     def _propagateSignal(self) :
         if self.IsNetworkComplete :
-            for layer in self._layers :
-                if type(layer) != MicroMLP.InputLayer :
-                    layer.ComputeLayerValues()
+            idx = 1
+            while idx < self.LayersCount :
+                for n in self._layers[idx].Neurons :
+                    n.ComputeValue()
+                idx += 1
             return True
         return False
 
     def _backPropagateError(self) :
         if self.IsNetworkComplete :
-            idx = len(self._layers)-2
+            idx = self.LayersCount-2
             while idx >= 0 :
-                self._layers[idx].ComputeLayerErrors()
+                for n in self._layers[idx].Neurons :
+                    n.ComputeError()
+                    for conn in n.GetOutputConnections() :
+                        conn.UpdateWeight(self.Eta, self.Alpha)
                 idx -= 1
             return True
         return False
