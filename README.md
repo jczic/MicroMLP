@@ -34,7 +34,7 @@
 
 | Name | Function |
 | - | - |
-| Create | `mlp = MicroMLP.Create(neuronsByLayers, activateFunctionName, layersAutoConnectFunction=None, useBiasValue=1.0)` |
+| Create | `mlp = MicroMLP.Create(neuronsByLayers, activationFuncName, layersAutoConnectFunction=None, useBiasValue=1.0)` |
 | LoadFromFile | `mlp = MicroMLP.LoadFromFile(filename)` |
 
 ### Using *MicroMLP* speedly creation of a neural network :
@@ -47,7 +47,7 @@ mlp = MicroMLP.Create([3, 10, 2], "Sigmoid", MicroMLP.LayersFullConnect)
 
 | Name | Function |
 | - | - |
-| Constructor | `mlp = MicroMLP(activateFunctionName)` |
+| Constructor | `mlp = MicroMLP()` |
 | GetLayer | `layer = mlp.GetLayer(layerIndex)` |
 | GetLayerIndex | `idx = mlp.GetLayerIndex(layer)` |
 | RemoveLayer | `mlp.RemoveLayer(layer)` |
@@ -65,7 +65,6 @@ mlp = MicroMLP.Create([3, 10, 2], "Sigmoid", MicroMLP.LayersFullConnect)
 | - | - | - |
 | Layers | `mlp.Layers` | get |
 | LayersCount | `mlp.LayersCount` | get |
-| ActivateFunctionName | `mlp.ActivateFunctionName` | get |
 | IsNetworkComplete | `mlp.IsNetworkComplete` | get |
 | MSE | `mlp.MSE` | get |
 | MAE | `mlp.MAE` | get |
@@ -78,7 +77,7 @@ mlp = MicroMLP.Create([3, 10, 2], "Sigmoid", MicroMLP.LayersFullConnect)
 from microMLP import MicroMLP
 
 mlp = MicroMLP.Create( neuronsByLayers           = [2, 5, 1],
-                       activateFunctionName      = MicroMLP.ACTFUNC_TANH,
+                       activationFuncName        = MicroMLP.ACTFUNC_TANH,
                        layersAutoConnectFunction = MicroMLP.LayersFullConnect )
 
 nnFalse  = MicroMLP.NNValue.FromBool(False)
@@ -124,7 +123,7 @@ if mlp.SaveToFile("mlp.json") :
 
 | Name | Function |
 | - | - |
-| Constructor | `layer = MicroMLP.Layer(parentMicroMLP, neuronsCount=0, activateFunctionName=None)` |
+| Constructor | `layer = MicroMLP.Layer(parentMicroMLP, activationFuncName=None, neuronsCount=0)` |
 | GetLayerIndex | `idx = layer.GetLayerIndex()` |
 | GetNeuron | `neuron = layer.GetNeuron(neuronIndex)` |
 | GetNeuronIndex | `idx = layer.GetNeuronIndex(neuron)` |
@@ -139,7 +138,7 @@ if mlp.SaveToFile("mlp.json") :
 | Property | Example | Read/Write |
 | - | - | - |
 | ParentMicroMLP | `layer.ParentMicroMLP` | get |
-| ActivateFunctionName | `layer.ActivateFunctionName` | get |
+| ActivationFuncName | `layer.ActivationFuncName` | get |
 | Neurons | `layer.Neurons` | get |
 | NeuronsCount | `layer.NeuronsCount` | get |
 
@@ -154,7 +153,7 @@ if mlp.SaveToFile("mlp.json") :
 
 | Name | Function |
 | - | - |
-| Constructor | `outputLayer = MicroMLP.OutputLayer(parentMicroMLP, neuronsCount=0, activateFunctionName=None)` |
+| Constructor | `outputLayer = MicroMLP.OutputLayer(parentMicroMLP, activationFuncName, neuronsCount=0)` |
 | GetOutputVectorNNValues | `outputVectorNNValues = outputLayer.GetOutputVectorNNValues()` |
 | ComputeTargetLayerError | `ok = outputLayer.ComputeTargetLayerError(targetVectorNNValues)` |
 
@@ -162,7 +161,7 @@ if mlp.SaveToFile("mlp.json") :
 
 | Name | Function |
 | - | - |
-| Constructor | `neuron = MicroMLP.Neuron(parentLayer, activateFunctionName)` |
+| Constructor | `neuron = MicroMLP.Neuron(parentLayer)` |
 | GetNeuronIndex | `idx = neuron.GetNeuronIndex()` |
 | GetInputConnections | `connections = neuron.GetInputConnections()` |
 | GetOutputConnections | `connections = neuron.GetOutputConnections()` |
@@ -180,7 +179,6 @@ if mlp.SaveToFile("mlp.json") :
 | Property | Example | Read/Write |
 | - | - | - |
 | ParentLayer | `neuron.ParentLayer` | get |
-| ActivateFunctionName | `neuron.ActivateFunctionName` | get |
 | ComputedOutput | `neuron.ComputedOutput` | get |
 | ComputedDeltaError | `neuron.ComputedDeltaError` | get |
 | ComputedSignalError | `neuron.ComputedSignalError` | get |

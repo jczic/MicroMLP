@@ -188,11 +188,9 @@ class MicroMLP :
 
         # -[ Constructor ]--------------------------------------
 
-        def __init__(self, parentLayer, activateFunctionName) :
+        def __init__(self, parentLayer) :
             parentLayer.AddNeuron(self)
             self._parentLayer           = parentLayer
-            self._activateFunctionName  = activateFunctionName
-            self._activateFunction      = MicroMLP.GetActivationFunction(activateFunctionName)
             self._inputConnections      = [ ]
             self._outputConnections     = [ ]
             self._inputBias             = None
@@ -238,8 +236,9 @@ class MicroMLP :
                 sum += conn.NeuronSrc.ComputedOutput * conn.Weight
             if self._inputBias :
             	sum += self._inputBias.Value * self._inputBias.Weight
-            if self._activateFunction :
-                self._computedOutput = self._activateFunction(sum * self._parentLayer.ParentMicroMLP.Gain)
+            if self._parentLayer._actFunc :
+                self._computedOutput = self._parentLayer._actFunc( sum * \
+                                                                   self._parentLayer.ParentMicroMLP.Gain )
 
         def ComputeError(self, targetNNValue=None) :
             if targetNNValue :
@@ -248,11 +247,11 @@ class MicroMLP :
                 self._computedDeltaError = 0.0
                 for conn in self._outputConnections :
                     self._computedDeltaError += conn.NeuronDst.ComputedSignalError * conn.Weight
-            if self._activateFunction :
+            if self._parentLayer._actFunc :
                 self._computedSignalError = self._computedDeltaError              \
                                           * self._parentLayer.ParentMicroMLP.Gain \
-                                          * self._activateFunction( self._computedOutput,
-                                                                    derivative = True )
+                                          * self._parentLayer._actFunc( self._computedOutput,
+                                                                        derivative = True )
 
         def Remove(self) :
             for conn in self._inputConnections :
@@ -268,10 +267,6 @@ class MicroMLP :
         @property
         def ParentLayer(self) :
             return self._parentLayer
-
-        @property
-        def ActivateFunctionName(self) :
-            return self._activateFunctionName
 
         @property
         def ComputedOutput(self) :
@@ -342,13 +337,14 @@ class MicroMLP :
 
         # -[ Constructor ]--------------------------------------
 
-        def __init__(self, parentMicroMLP, neuronsCount=0, activateFunctionName=None) :
+        def __init__(self, parentMicroMLP, activationFuncName=None, neuronsCount=0) :
             self._parentMicroMLP        = parentMicroMLP
-            self._activateFunctionName  = activateFunctionName
+            self._actFuncName           = activationFuncName
+            self._actFunc               = MicroMLP.GetActivationFunction(activationFuncName)
             self._neurons               = [ ]
             self._parentMicroMLP.AddLayer(self)
             for i in range(neuronsCount) :
-                MicroMLP.Neuron(self, activateFunctionName)
+                MicroMLP.Neuron(self)
 
         # -[ Public functions ]---------------------------------
 
@@ -405,8 +401,8 @@ class MicroMLP :
             return self._parentMicroMLP
 
         @property
-        def ActivateFunctionName(self) :
-            return self._activateFunctionName
+        def ActivationFuncName(self) :
+            return self._actFuncName
 
         @property
         def Neurons(self) :
@@ -430,7 +426,7 @@ class MicroMLP :
         # -[ Constructor ]--------------------------------------
 
         def __init__(self, parentMicroMLP, neuronsCount=0) :
-            super().__init__(parentMicroMLP, neuronsCount)
+            super().__init__(parentMicroMLP, None, neuronsCount)
 
         # -[ Public functions ]---------------------------------
 
@@ -454,8 +450,8 @@ class MicroMLP :
 
         # -[ Constructor ]--------------------------------------
 
-        def __init__(self, parentMicroMLP, neuronsCount=0, activateFunctionName=None) :
-            super().__init__(parentMicroMLP, neuronsCount, activateFunctionName)
+        def __init__(self, parentMicroMLP, activationFuncName, neuronsCount=0) :
+            super().__init__(parentMicroMLP, activationFuncName, neuronsCount)
 
         # -[ Public functions ]---------------------------------
 
@@ -478,31 +474,30 @@ class MicroMLP :
 
     # -[ Constructor ]--------------------------------------
 
-    def __init__(self, activateFunctionName) :
-        if not MicroMLP.GetActivationFunction(activateFunctionName) :
-            raise Exception('MicroMLP : Unknow activateFunctionName "%s".' % activateFunctionName)
-        self._activateFunctionName = activateFunctionName
-        self._layers               = [ ]
-        self._examples             = [ ]
+    def __init__(self) :
+        self._layers   = [ ]
+        self._examples = [ ]
 
     # -[ Static functions ]-------------------------------------
 
     @staticmethod
-    def Create(neuronsByLayers, activateFunctionName, layersAutoConnectFunction=None, useBiasValue=1.0) :
+    def Create(neuronsByLayers, activationFuncName, layersAutoConnectFunction=None, useBiasValue=1.0) :
         if not neuronsByLayers or len(neuronsByLayers) < 2 :
             raise Exception('MicroMLP.Create : Incorrect "neuronsByLayers" parameter.')
         for x in neuronsByLayers :
             if x < 1 :
                 raise Exception('MicroMLP.Create : Incorrect count in "neuronsByLayers".')
-        mlp = MicroMLP(activateFunctionName)
+        if not MicroMLP.GetActivationFunction(activationFuncName) :
+            raise Exception('MicroMLP : Unknow activationFuncName "%s".' % activationFuncName)
+        mlp = MicroMLP()
         for i in range(len(neuronsByLayers)) :
             if i == 0 :
                 layer = MicroMLP.InputLayer(mlp, neuronsByLayers[i])
             else :
             	if i == len(neuronsByLayers)-1 :
-            		layer = MicroMLP.OutputLayer(mlp, neuronsByLayers[i], activateFunctionName)
+            		layer = MicroMLP.OutputLayer(mlp, activationFuncName, neuronsByLayers[i])
             	else :
-            		layer = MicroMLP.Layer(mlp, neuronsByLayers[i], activateFunctionName)
+            		layer = MicroMLP.Layer(mlp, activationFuncName, neuronsByLayers[i])
             	if layersAutoConnectFunction :
             		layersAutoConnectFunction(mlp.GetLayer(i-1), layer)
             	if useBiasValue :
@@ -556,38 +551,48 @@ class MicroMLP :
                     MicroMLP.Connection(nSrc, nDst)
 
     @staticmethod
-    def GetActivationFunction(name) :
-        funcs = {
-            MicroMLP.ACTFUNC_HEAVISIDE : MicroMLP.HeavisideActivation,
-            MicroMLP.ACTFUNC_SIGMOID   : MicroMLP.SigmoidActivation,
-            MicroMLP.ACTFUNC_TANH      : MicroMLP.TanHActivation,
-            MicroMLP.ACTFUNC_RELU      : MicroMLP.ReLUActivation,
-            MicroMLP.ACTFUNC_GAUSSIAN  : MicroMLP.GaussianActivation
-        }
-        return funcs[name] if name in funcs else None
+    def GetActivationFunction(actFuncName) :
+        if actFuncName :
+            funcs = {
+                MicroMLP.ACTFUNC_HEAVISIDE : MicroMLP.HeavisideActivation,
+                MicroMLP.ACTFUNC_SIGMOID   : MicroMLP.SigmoidActivation,
+                MicroMLP.ACTFUNC_TANH      : MicroMLP.TanHActivation,
+                MicroMLP.ACTFUNC_RELU      : MicroMLP.ReLUActivation,
+                MicroMLP.ACTFUNC_GAUSSIAN  : MicroMLP.GaussianActivation
+            }
+            if actFuncName in funcs :
+                return funcs[actFuncName]
+        return None
     
     @staticmethod
     def LoadFromFile(filename) :
-        try :
             with open(filename, 'r') as jsonFile :
                 o = load(jsonFile)
-            mlp       = MicroMLP.Create(o['Struct'], o['ActFunc'], useBiasValue=None)
+            mlp       = MicroMLP()
             mlp.Eta   = o['Eta']
             mlp.Alpha = o['Alpha']
             mlp.Gain  = o['Gain']
-            for layer in mlp.Layers :
-                oLayer = o['Layers'][layer.GetLayerIndex()]
+            oLayers   = o['Layers']
+            for i in range(len(oLayers)) :
+                oLayer             = oLayers[i]
+                activationFuncName = oLayer['Func']
+                oNeurons           = oLayer['Neurons']
+                if i == 0 :
+                    layer = MicroMLP.InputLayer(mlp, len(oNeurons))
+                else :
+                    if i == len(oLayers)-1 :
+                        layer = MicroMLP.OutputLayer(mlp, activationFuncName, len(oNeurons))
+                    else :
+                        layer = MicroMLP.Layer(mlp, activationFuncName, len(oNeurons))
                 for neuron in layer.Neurons :
-                    oNeuron = oLayer[neuron.GetNeuronIndex()]
+                    oNeuron = oNeurons[neuron.GetNeuronIndex()]
                     oBias   = oNeuron['Bias']
                     if oBias :
                     	MicroMLP.Bias(neuron, oBias['Val'], oBias['Wght'])
                     for oConn in oNeuron['Conn'] :
-                        nDst = mlp.GetLayer(oConn['LDst']).GetNeuron(oConn['NDst'])
-                        MicroMLP.Connection(neuron, nDst, oConn['Wght'])
+                        nSrc = mlp.GetLayer(oConn['LSrc']).GetNeuron(oConn['NSrc'])
+                        MicroMLP.Connection(nSrc, neuron, oConn['Wght'])
             return mlp
-        except :
-            return None
 
     # -[ Public functions ]---------------------------------
 
@@ -643,13 +648,13 @@ class MicroMLP :
             'Eta'     : self.Eta,
             'Alpha'   : self.Alpha,
             'Gain'    : self.Gain,
-            'ActFunc' : self._activateFunctionName,
-            'Struct'  : [ ],
             'Layers'  : [ ]
         }
         for layer in self.Layers :
-            o['Struct'].append(layer.NeuronsCount)
-            oLayer = [ ]
+            oLayer = {
+                'Func'    : layer.ActivationFuncName,
+                'Neurons' : [ ]
+            }
             for neuron in layer.Neurons :
             	bias = neuron.GetBias()
             	if bias :
@@ -663,13 +668,13 @@ class MicroMLP :
             		'Bias' : oBias,
             		'Conn' : [ ]
             	}
-            	for conn in neuron.GetOutputConnections() :
+            	for conn in neuron.GetInputConnections() :
             		oNeuron['Conn'].append( {
-            			'Wght' : conn.Weight,
-            			'LDst' : conn.NeuronDst.ParentLayer.GetLayerIndex(),
-            			'NDst' : conn.NeuronDst.GetNeuronIndex()
+            			'LSrc' : conn.NeuronSrc.ParentLayer.GetLayerIndex(),
+            			'NSrc' : conn.NeuronSrc.GetNeuronIndex(),
+                        'Wght' : conn.Weight
             		} )
-            	oLayer.append(oNeuron)
+            	oLayer['Neurons'].append(oNeuron)
             o['Layers'].append(oLayer)
         try :
             jsonStr  = dumps(o)
@@ -730,10 +735,6 @@ class MicroMLP :
     @property
     def LayersCount(self) :
         return len(self._layers)
-
-    @property
-    def ActivateFunctionName(self) :
-        return self._activateFunctionName
 
     @property
     def IsNetworkComplete(self) :
