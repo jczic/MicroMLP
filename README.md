@@ -6,9 +6,11 @@
 - `"microMLP.py"`
 
 #### MicroMLP features :
-- Modifiable multilayer structure
-- Integrated bias connections
-- Momentum weight included
+- Modifiable multilayer and connections structure
+- Integrated bias on neurons
+- Included momentum weights
+- Activation functions by layer
+- Parameters Alpha, Eta and Gain
 - Save and load all structure to/from json file
 - Various activation functions :
   - Heaviside binary step
