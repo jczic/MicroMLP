@@ -4,7 +4,7 @@ Copyright © 2018 Jean-Christophe Bos & HC² (www.hc2.fr)
 """
 
 
-from math import pow, exp
+from math import exp
 from json import load, dumps
 from time import time
 
@@ -142,7 +142,7 @@ class MicroMLP :
             neuronDst.AddInputConnection(self)
             self._neuronSrc      = neuronSrc
             self._neuronDst      = neuronDst
-            self._weight         = weight if weight else (MicroMLP.RandomFloat()-0.5)
+            self._weight         = weight if weight else MicroMLP.RandomNetworkWeight()
             self._momentumWeight = 0.0
 
         # -[ Public functions ]---------------------------------
@@ -297,7 +297,7 @@ class MicroMLP :
             neuronDst.SetBias(self)
             self._neuronDst      = neuronDst
             self._value          = value
-            self._weight         = weight if weight else (MicroMLP.RandomFloat()-0.5)
+            self._weight         = weight if weight else MicroMLP.RandomNetworkWeight()
             self._momentumWeight = 0.0
 
         # -[ Public functions ]---------------------------------
@@ -508,8 +508,12 @@ class MicroMLP :
     @staticmethod
     def RandomFloat() :
         if 'rng' in globals() :
-            return rng() / pow(2, 24)
+            return rng() / (2 ** 24)
         return random()
+
+    @staticmethod
+    def RandomNetworkWeight() :
+        return (MicroMLP.RandomFloat()-0.5) * 0.99
 
     @staticmethod
     def HeavisideActivation(x, derivative=False) :
