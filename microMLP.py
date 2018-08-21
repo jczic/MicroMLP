@@ -23,7 +23,7 @@ class MicroMLP :
 
     Eta                 = 0.30
     Alpha               = 0.85
-    Gain                = 2.30
+    Gain                = 1.00
 
     CorrectLearnedMAE   = 0.02
 
