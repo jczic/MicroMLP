@@ -21,8 +21,8 @@ class MicroMLP :
     ACTFUNC_RELU        = 'ReLU'
     ACTFUNC_GAUSSIAN    = 'Gaussian'
 
-    Eta                 = 0.30
-    Alpha               = 0.85
+    Eta                 = 1.00
+    Alpha               = 0.70
     Gain                = 1.00
 
     CorrectLearnedMAE   = 0.02
@@ -140,17 +140,19 @@ class MicroMLP :
         def __init__(self, neuronSrc, neuronDst, weight=None) :
             neuronSrc.AddOutputConnection(self)
             neuronDst.AddInputConnection(self)
-            self._neuronSrc      = neuronSrc
-            self._neuronDst      = neuronDst
-            self._weight         = weight if weight else MicroMLP.RandomNetworkWeight()
-            self._momentumWeight = 0.0
+            self._neuronSrc           = neuronSrc
+            self._neuronDst           = neuronDst
+            self._weight              = weight if weight else MicroMLP.RandomNetworkWeight()
+            self._momentumDeltaWeight = 0.0
 
         # -[ Public functions ]---------------------------------
 
         def UpdateWeight(self, eta, alpha) :
-            w = eta * self._neuronSrc.ComputedOutput * self._neuronDst.ComputedSignalError
-            self._weight         += w + (alpha * self._momentumWeight)
-            self._momentumWeight  = w
+            deltaWeight                = eta \
+                                       * self._neuronSrc.ComputedOutput \
+                                       * self._neuronDst.ComputedSignalError
+            self._weight              += deltaWeight + (alpha * self._momentumDeltaWeight)
+            self._momentumDeltaWeight  = deltaWeight
 
         def Remove(self) :
             if self._neuronSrc and self._neuronDst :
@@ -295,17 +297,19 @@ class MicroMLP :
 
         def __init__(self, neuronDst, value=1.0, weight=None) :
             neuronDst.SetBias(self)
-            self._neuronDst      = neuronDst
-            self._value          = value
-            self._weight         = weight if weight else MicroMLP.RandomNetworkWeight()
-            self._momentumWeight = 0.0
+            self._neuronDst           = neuronDst
+            self._value               = value
+            self._weight              = weight if weight else MicroMLP.RandomNetworkWeight()
+            self._momentumDeltaWeight = 0.0
 
         # -[ Public functions ]---------------------------------
 
         def UpdateWeight(self, eta, alpha) :
-            w = eta * self._value * self._neuronDst.ComputedSignalError
-            self._weight         += w + (alpha * self._momentumWeight)
-            self._momentumWeight  = w
+            deltaWeight                = eta \
+                                       * self._value \
+                                       * self._neuronDst.ComputedSignalError
+            self._weight              += deltaWeight + (alpha * self._momentumDeltaWeight)
+            self._momentumDeltaWeight  = deltaWeight
 
         def Remove(self) :
         	nDst.SetBias(None)
@@ -513,7 +517,7 @@ class MicroMLP :
 
     @staticmethod
     def RandomNetworkWeight() :
-        return (MicroMLP.RandomFloat()-0.5) * 0.99
+        return (MicroMLP.RandomFloat()-0.5) * 0.7
 
     @staticmethod
     def HeavisideActivation(x, derivative=False) :

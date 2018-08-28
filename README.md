@@ -8,9 +8,10 @@
 #### MicroMLP features :
 - Modifiable multilayer and connections structure
 - Integrated bias on neurons
-- Included momentum weights
+- Plasticity of the connections included
 - Activation functions by layer
 - Parameters Alpha, Eta and Gain
+- Managing set of examples and learning
 - Save and load all structure to/from json file
 - Various activation functions :
   - Heaviside binary step
@@ -102,12 +103,12 @@ if mlp.SaveToFile("mlp.json") :
 	print( "MicroMLP structure saved!" )
 ```
 
-| Variable | Default |
-| - | - |
-| `mlp.Eta` | 0.30 |
-| `mlp.Alpha` | 0.85 |
-| `mlp.Gain` | 2.30 |
-| `mlp.CorrectLearnedMAE` | 0.02 |
+| Variable | Description | Default |
+| - | - | - |
+| `mlp.Eta` | Weighting of the error correction | 0.30 |
+| `mlp.Alpha` | Strength of connections plasticity | 0.85 |
+| `mlp.Gain` | Network learning gain | 2.30 |
+| `mlp.CorrectLearnedMAE` | Threshold of self-learning error | 0.02 |
 
 | Graphe | Activation function name | Const | Detail |
 | - | - | - | - |
