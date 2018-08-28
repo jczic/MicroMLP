@@ -105,9 +105,9 @@ if mlp.SaveToFile("mlp.json") :
 
 | Variable | Description | Default |
 | - | - | - |
-| `mlp.Eta` | Weighting of the error correction | 0.30 |
-| `mlp.Alpha` | Strength of connections plasticity | 0.85 |
-| `mlp.Gain` | Network learning gain | 2.30 |
+| `mlp.Eta` | Weighting of the error correction | 1.00 |
+| `mlp.Alpha` | Strength of connections plasticity | 0.70 |
+| `mlp.Gain` | Network learning gain | 1.00 |
 | `mlp.CorrectLearnedMAE` | Threshold of self-learning error | 0.02 |
 
 | Graphe | Activation function name | Const | Detail |
