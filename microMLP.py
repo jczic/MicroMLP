@@ -4,7 +4,7 @@ Copyright © 2018 Jean-Christophe Bos & HC² (www.hc2.fr)
 """
 
 
-from math import exp
+from math import exp, log
 from json import load, dumps
 from time import time
 
@@ -18,6 +18,7 @@ class MicroMLP :
     ACTFUNC_HEAVISIDE   = 'Heaviside'
     ACTFUNC_SIGMOID     = 'Sigmoid'
     ACTFUNC_TANH        = 'TanH'
+    ACTFUNC_SOFTPLUS    = 'SoftPlus'
     ACTFUNC_RELU        = 'ReLU'
     ACTFUNC_GAUSSIAN    = 'Gaussian'
 
@@ -540,6 +541,13 @@ class MicroMLP :
         return (tanh / 2.0) + 0.5
 
     @staticmethod
+    def SoftPlusActivation(x, derivative=False) :
+        if derivative :
+            return ( 1 / (1 + exp(-x)) ) - 0.5
+        return log(1 + exp(x))
+
+
+    @staticmethod
     def ReLUActivation(x, derivative=False) :
         if derivative :
             return 1.0
@@ -565,6 +573,7 @@ class MicroMLP :
                 MicroMLP.ACTFUNC_HEAVISIDE : MicroMLP.HeavisideActivation,
                 MicroMLP.ACTFUNC_SIGMOID   : MicroMLP.SigmoidActivation,
                 MicroMLP.ACTFUNC_TANH      : MicroMLP.TanHActivation,
+                MicroMLP.ACTFUNC_SOFTPLUS  : MicroMLP.SoftPlusActivation,
                 MicroMLP.ACTFUNC_RELU      : MicroMLP.ReLUActivation,
                 MicroMLP.ACTFUNC_GAUSSIAN  : MicroMLP.GaussianActivation
             }

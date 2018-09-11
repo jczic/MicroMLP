@@ -115,6 +115,7 @@ if mlp.SaveToFile("mlp.json") :
 | ![HC²](graphe_heaviside.png "Heaviside binary step") | `"Heaviside"` | MicroMLP.ACTFUNC_HEAVISIDE | Heaviside binary step |
 | ![HC²](graphe_sigmoid.png "Logistic (sigmoid or soft step)") | `"Sigmoid"` | MicroMLP.ACTFUNC_SIGMOID | Logistic (sigmoid or soft step) |
 | ![HC²](graphe_tanh.png "Hyperbolic tangent") | `"TanH"` | MicroMLP.ACTFUNC_TANH | Hyperbolic tangent |
+| ![HC²](graphe_softplus.png "SoftPlus rectifier") | `"SoftPlus"` | MicroMLP.ACTFUNC_SOFTPLUS | SoftPlus rectifier |
 | ![HC²](graphe_relu.png "Rectified linear unit") | `"ReLU"` | MicroMLP.ACTFUNC_RELU | Rectified linear unit |
 | ![HC²](graphe_gaussian.png "Gaussian function") | `"Gaussian"` | MicroMLP.ACTFUNC_GAUSSIAN | Gaussian function |
 
