@@ -12,12 +12,14 @@
 - Activation functions by layer
 - Parameters Alpha, Eta and Gain
 - Managing set of examples and learning
+- QLearning functions to use reinforcement learning
 - Save and load all structure to/from json file
 - Various activation functions :
   - Heaviside binary step
   - Logistic (sigmoid or soft step)
   - Hyperbolic tangent
-  - Rectified linear unit
+  - SoftPlus rectifier
+  - ReLU (rectified linear unit)
   - Gaussian function
 
 #### Use deep learning for :
@@ -59,6 +61,8 @@ mlp = MicroMLP.Create([3, 10, 2], "Sigmoid", MicroMLP.LayersFullConnect)
 | Learn | `ok = mlp.Learn(inputVectorNNValues, targetVectorNNValues)` |
 | Test | `ok = mlp.Test(inputVectorNNValues, targetVectorNNValues)` |
 | Predict | `outputVectorNNValues = mlp.Predict(inputVectorNNValues)` |
+| QLearningLearnForChosenAction | `ok = mlp.QLearningLearnForChosenAction(stateVectorNNValues, rewardNNValue, pastStateVectorNNValues, chosenActionIndex, terminalState=True, discountFactorNNValue=None)` |
+| QLearningPredictBestActionIndex | `bestActionIndex = mlp.QLearningPredictBestActionIndex(stateVectorNNValues)` |
 | SaveToFile | `ok = mlp.SaveToFile(filename)` |
 | AddExample | `ok = mlp.AddExample(inputVectorNNValues, targetVectorNNValues)` |
 | ClearExamples | `mlp.ClearExamples()` |

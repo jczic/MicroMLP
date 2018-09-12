@@ -660,6 +660,44 @@ class MicroMLP :
             return self.GetOutputLayer().GetOutputVectorNNValues()
         return None
 
+    def QLearningLearnForChosenAction( self,
+                                       stateVectorNNValues,
+                                       rewardNNValue,
+                                       pastStateVectorNNValues,
+                                       chosenActionIndex,
+                                       terminalState           = True,
+                                       discountFactorNNValue   = None ) :
+        if chosenActionIndex >= 0 and \
+           chosenActionIndex < self.GetOutputLayer().NeuronsCount :
+            if not terminalState :
+                if not discountFactorNNValue or \
+                   not self._simulate(stateVectorNNValues) :
+                    return False
+                bestActVal = 0
+                for nnVal in self.GetOutputLayer().GetOutputVectorNNValues() :
+                    if nnVal.AsAnalogSignal > bestActVal :
+                        bestActVal = nnVal.AsAnalogSignal
+            if self._simulate(pastStateVectorNNValues) :
+                targetVectorNNValues = self.GetOutputLayer().GetOutputVectorNNValues()
+                targetActVal         = rewardNNValue.AsAnalogSignal
+                if not terminalState :
+                    targetActVal += discountFactorNNValue.AsAnalogSignal * bestActVal
+                targetVectorNNValues[chosenActionIndex].AsAnalogSignal = targetActVal
+                return self._simulate(pastStateVectorNNValues, targetVectorNNValues, True)
+        return False
+
+    def QLearningPredictBestActionIndex(self, stateVectorNNValues) :
+        bestActIdx = None
+        if self._simulate(stateVectorNNValues) :
+            maxVal = 0
+            idx    = 0
+            for nnVal in self.GetOutputLayer().GetOutputVectorNNValues() :
+                if nnVal.AsAnalogSignal > maxVal :
+                    maxVal     = nnVal.AsAnalogSignal
+                    bestActIdx = idx
+                idx += 1
+        return bestActIdx
+
     def SaveToFile(self, filename) :
         o = {
             'Eta'     : self.Eta,
