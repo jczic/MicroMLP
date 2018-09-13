@@ -83,7 +83,7 @@ mlp = MicroMLP.Create([3, 10, 2], "Sigmoid", MicroMLP.LayersFullConnect)
 ```python
 from microMLP import MicroMLP
 
-mlp = MicroMLP.Create( neuronsByLayers           = [2, 5, 1],
+mlp = MicroMLP.Create( neuronsByLayers           = [2, 2, 1],
                        activationFuncName        = MicroMLP.ACTFUNC_TANH,
                        layersAutoConnectFunction = MicroMLP.LayersFullConnect )
 
@@ -109,9 +109,9 @@ if mlp.SaveToFile("mlp.json") :
 
 | Variable | Description | Default |
 | - | - | - |
-| `mlp.Eta` | Weighting of the error correction | 1.00 |
-| `mlp.Alpha` | Strength of connections plasticity | 0.70 |
-| `mlp.Gain` | Network learning gain | 1.00 |
+| `mlp.Eta` | Weighting of the error correction | 0.30 |
+| `mlp.Alpha` | Strength of connections plasticity | 0.75 |
+| `mlp.Gain` | Network learning gain | 0.99 |
 | `mlp.CorrectLearnedMAE` | Threshold of self-learning error | 0.02 |
 
 | Graphe | Activation function name | Const | Detail |

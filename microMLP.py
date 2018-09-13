@@ -22,9 +22,9 @@ class MicroMLP :
     ACTFUNC_RELU        = 'ReLU'
     ACTFUNC_GAUSSIAN    = 'Gaussian'
 
-    Eta                 = 1.00
-    Alpha               = 0.70
-    Gain                = 1.00
+    Eta                 = 0.30
+    Alpha               = 0.75
+    Gain                = 0.99
 
     CorrectLearnedMAE   = 0.02
 
@@ -197,6 +197,7 @@ class MicroMLP :
             self._inputConnections      = [ ]
             self._outputConnections     = [ ]
             self._inputBias             = None
+            self._computedInput         = 0.0
             self._computedOutput        = 0.0
             self._computedDeltaError    = 0.0
             self._computedSignalError   = 0.0
@@ -225,22 +226,26 @@ class MicroMLP :
             self._outputConnections.remove(connection)
 
         def SetBias(self, bias) :
-        	self._inputBias = bias
+            self._inputBias = bias
 
         def GetBias(self) :
-        	return self._inputBias
+            return self._inputBias
 
         def SetOutputNNValue(self, nnvalue) :
             self._computedOutput = nnvalue.AsAnalogSignal
 
-        def ComputeOutput(self) :
+        def _computeInput(self) :
             sum = 0.0
             for conn in self._inputConnections :
                 sum += conn.NeuronSrc.ComputedOutput * conn.Weight
             if self._inputBias :
-            	sum += self._inputBias.Value * self._inputBias.Weight
+                sum += self._inputBias.Value * self._inputBias.Weight
+            self._computedInput = sum
+
+        def ComputeOutput(self) :
+            self._computeInput()
             if self._parentLayer._actFunc :
-                self._computedOutput = self._parentLayer._actFunc( sum * \
+                self._computedOutput = self._parentLayer._actFunc( self._computedInput * \
                                                                    self._parentLayer.ParentMicroMLP.Gain )
 
         def ComputeError(self, targetNNValue=None) :
@@ -253,7 +258,7 @@ class MicroMLP :
             if self._parentLayer._actFunc :
                 self._computedSignalError = self._computedDeltaError              \
                                           * self._parentLayer.ParentMicroMLP.Gain \
-                                          * self._parentLayer._actFunc( self._computedOutput,
+                                          * self._parentLayer._actFunc( self._computedInput,
                                                                         derivative = True )
 
         def Remove(self) :
@@ -313,7 +318,7 @@ class MicroMLP :
             self._momentumDeltaWeight  = deltaWeight
 
         def Remove(self) :
-        	nDst.SetBias(None)
+            nDst.SetBias(None)
 
         # -[ Properties ]---------------------------------------
 
@@ -499,15 +504,15 @@ class MicroMLP :
             if i == 0 :
                 layer = MicroMLP.InputLayer(mlp, neuronsByLayers[i])
             else :
-            	if i == len(neuronsByLayers)-1 :
-            		layer = MicroMLP.OutputLayer(mlp, activationFuncName, neuronsByLayers[i])
-            	else :
-            		layer = MicroMLP.Layer(mlp, activationFuncName, neuronsByLayers[i])
-            	if layersAutoConnectFunction :
-            		layersAutoConnectFunction(mlp.GetLayer(i-1), layer)
-            	if useBiasValue :
-            		for n in layer.Neurons :
-            			MicroMLP.Bias(n, useBiasValue)
+                if i == len(neuronsByLayers)-1 :
+                    layer = MicroMLP.OutputLayer(mlp, activationFuncName, neuronsByLayers[i])
+                else :
+                    layer = MicroMLP.Layer(mlp, activationFuncName, neuronsByLayers[i])
+                if layersAutoConnectFunction :
+                    layersAutoConnectFunction(mlp.GetLayer(i-1), layer)
+                if useBiasValue :
+                    for n in layer.Neurons :
+                        MicroMLP.Bias(n, useBiasValue)
         return mlp
 
     @staticmethod
@@ -528,36 +533,36 @@ class MicroMLP :
 
     @staticmethod
     def SigmoidActivation(x, derivative=False) :
+        f = 1.0 / ( 1.0 + exp(-x) )
         if derivative :
-            return x * (1.0-x)
-        return 1.0 / ( 1.0 + exp(-x) )
+            return f * (1.0-f)
+        return f
 
     @staticmethod
     def TanHActivation(x, derivative=False) :
+        f = ( 2.0 / (1.0 + exp(-2.0 * x)) ) - 1.0
         if derivative :
-            x = (x - 0.5) * 2
-            return 1.0 - (x ** 2)         
-        tanh = 2.0 / (1.0 + exp(-2.0 * x)) - 1.0
-        return (tanh / 2.0) + 0.5
+            return 1.0 - (f ** 2)         
+        return f
 
     @staticmethod
     def SoftPlusActivation(x, derivative=False) :
         if derivative :
-            return ( 1 / (1 + exp(-x)) ) - 0.5
+            return 1 / (1 + exp(-x))
         return log(1 + exp(x))
-
 
     @staticmethod
     def ReLUActivation(x, derivative=False) :
         if derivative :
-            return 1.0
-        return x if x >= 0 else 0.0
+            return 1.0 if x >= 0 else 0.0
+        return max(0.0, x)
 
     @staticmethod
     def GaussianActivation(x, derivative=False) :
+        f = exp(-x ** 2)
         if derivative :
-            return x * (1.0-x)
-        return exp(-x ** 2)
+            return -2 * x * f
+        return f
 
     @staticmethod
     def LayersFullConnect(layerSrc, layerDst) :
@@ -605,7 +610,7 @@ class MicroMLP :
                     oNeuron = oNeurons[neuron.GetNeuronIndex()]
                     oBias   = oNeuron['Bias']
                     if oBias :
-                    	MicroMLP.Bias(neuron, oBias['Val'], oBias['Wght'])
+                        MicroMLP.Bias(neuron, oBias['Val'], oBias['Wght'])
                     for oConn in oNeuron['Conn'] :
                         nSrc = mlp.GetLayer(oConn['LSrc']).GetNeuron(oConn['NSrc'])
                         MicroMLP.Connection(nSrc, neuron, oConn['Wght'])
@@ -711,25 +716,25 @@ class MicroMLP :
                 'Neurons' : [ ]
             }
             for neuron in layer.Neurons :
-            	bias = neuron.GetBias()
-            	if bias :
-            		oBias = {
-            			'Val'  : bias.Value,
-            			'Wght' : bias.Weight
-            		}
-            	else :
-            		oBias = None
-            	oNeuron = {
-            		'Bias' : oBias,
-            		'Conn' : [ ]
-            	}
-            	for conn in neuron.GetInputConnections() :
-            		oNeuron['Conn'].append( {
-            			'LSrc' : conn.NeuronSrc.ParentLayer.GetLayerIndex(),
-            			'NSrc' : conn.NeuronSrc.GetNeuronIndex(),
+                bias = neuron.GetBias()
+                if bias :
+                    oBias = {
+                        'Val'  : bias.Value,
+                        'Wght' : bias.Weight
+                    }
+                else :
+                    oBias = None
+                oNeuron = {
+                    'Bias' : oBias,
+                    'Conn' : [ ]
+                }
+                for conn in neuron.GetInputConnections() :
+                    oNeuron['Conn'].append( {
+                        'LSrc' : conn.NeuronSrc.ParentLayer.GetLayerIndex(),
+                        'NSrc' : conn.NeuronSrc.GetNeuronIndex(),
                         'Wght' : conn.Weight
-            		} )
-            	oLayer['Neurons'].append(oNeuron)
+                    } )
+                oLayer['Neurons'].append(oNeuron)
             o['Layers'].append(oLayer)
         try :
             jsonStr  = dumps(o)
@@ -840,13 +845,14 @@ class MicroMLP :
             idx = self.LayersCount-1
             while idx >= 0 :
                 for n in self.GetLayer(idx).Neurons :
-                	if idx < self.LayersCount-1 :
-	                    n.ComputeError()
-	                    for conn in n.GetOutputConnections() :
-	                        conn.UpdateWeight(self.Eta, self.Alpha)
-	                bias = n.GetBias()
-	                if bias :
-	                	bias.UpdateWeight(self.Eta, self.Alpha)
+                    if idx < self.LayersCount-1 :
+                        if idx > 0 :
+                            n.ComputeError()
+                        for conn in n.GetOutputConnections() :
+                            conn.UpdateWeight(self.Eta, self.Alpha)
+                    bias = n.GetBias()
+                    if bias :
+                        bias.UpdateWeight(self.Eta, self.Alpha)
                 idx -= 1
             return True
         return False
