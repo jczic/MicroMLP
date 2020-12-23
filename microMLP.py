@@ -5,13 +5,13 @@ Copyright © 2018 Jean-Christophe Bos & HC² (www.hc2.fr)
 
 
 from math import exp, log
-from json import load, dumps
-from time import time
+from ujson import load, dumps
+from utime import time
 
 try :
     from machine import rng
 except :
-    from random import random
+    from urandom import random
 
 class MicroMLP :
 
