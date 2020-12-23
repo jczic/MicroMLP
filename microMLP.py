@@ -542,7 +542,7 @@ class MicroMLP :
     def TanHActivation(x, derivative=False) :
         f = ( 2.0 / (1.0 + exp(-2.0 * x)) ) - 1.0
         if derivative :
-            return 1.0 - (f ** 2)         
+            return 1.0 - (f ** 2)
         return f
 
     @staticmethod
