@@ -1,17 +1,17 @@
 """
 The MIT License (MIT)
-Copyright © 2018 Jean-Christophe Bos & HC² (www.hc2.fr)
+Copyright © 2018 Jean-Christophe Bos
 """
 
 
-from math import exp, log
-from ujson import load, dumps
-from utime import time
+from math  import exp, log
+from json  import load, dumps
+from time  import time
 
 try :
     from machine import rng
 except :
-    from urandom import random
+    from random  import random
 
 class MicroMLP :
 
