@@ -18,9 +18,9 @@ def rgb2hex(rgb):
 
 # ----------------------------------------------------------------
 
-def onCanvasClick(evt) :
-    examples.append((evt.x, evt.y))
-    can.create_oval( evt.x-7, evt.y-7, evt.x+7, evt.y+7,
+def addExample(x, y) :
+    examples.append((x, y))
+    can.create_oval( x-7, y-7, x+7, y+7,
                      fill    = '#3366AA',
                      outline = '#AA3366',
                      width   = 2 )
@@ -48,8 +48,13 @@ class processThread(Thread) :
 
 # ----------------------------------------------------------------
 
-mlp = MicroMLP.Create( neuronsByLayers           = [1, 15, 1],
-                       activationFuncName        = MicroMLP.ACTFUNC_TANH,
+def onCanvasClick(evt) :
+    addExample(evt.x, evt.y)
+
+# ----------------------------------------------------------------
+
+mlp = MicroMLP.Create( neuronsByLayers           = [1, 15, 15, 1],
+                       activationFuncName        = MicroMLP.ACTFUNC_GAUSSIAN,
                        layersAutoConnectFunction = MicroMLP.LayersFullConnect )
 
 mainWindow = Tk()
